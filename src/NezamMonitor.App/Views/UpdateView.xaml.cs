@@ -47,21 +47,6 @@ public partial class UpdateView : UserControl
             // Stop: enabled only when busy
             BtnStop.IsEnabled = ec.IsBusy;
 
-            // Pause: enabled only when busy, changes text/color
-            BtnPause.IsEnabled = ec.IsBusy;
-            if (ec.IsPaused)
-            {
-                BtnPause.Content = "▶ ادامه";
-                BtnPause.Background = new System.Windows.Media.SolidColorBrush(
-                    System.Windows.Media.Color.FromRgb(0x27, 0xAE, 0x60));
-            }
-            else
-            {
-                BtnPause.Content = "⏸ وقفه";
-                BtnPause.Background = new System.Windows.Media.SolidColorBrush(
-                    System.Windows.Media.Color.FromRgb(0xF3, 0x9C, 0x12));
-            }
-
             // Progress + Status
             ProgressBar.Value = ec.Progress;
             StatusText.Text = ec.StatusMessage;
@@ -89,12 +74,6 @@ public partial class UpdateView : UserControl
     private void BtnStop_Click(object sender, RoutedEventArgs e)
     {
         ExtractionController.Instance.StopCommand.Execute(null);
-    }
-
-    private void BtnPause_Click(object sender, RoutedEventArgs e)
-    {
-        ExtractionController.Instance.PauseResumeCommand.Execute(null);
-        UpdateButtonStates();
     }
 
     private void BtnLoad_Click(object sender, RoutedEventArgs e)

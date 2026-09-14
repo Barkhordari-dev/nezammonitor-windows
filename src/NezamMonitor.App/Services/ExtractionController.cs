@@ -18,12 +18,10 @@ public sealed class ExtractionController : ViewModelBase
     private static readonly object _lock = new();
 
     private bool _isBusy;
-    private bool _isPaused;
     private string _statusMessage = "آماده";
     private double _progress;
     private string _logText = "";
     private CancellationTokenSource? _cts;
-    private ManualResetEventSlim? _pauseEvent;
 
     public static ExtractionController Instance
     {
@@ -37,7 +35,6 @@ public sealed class ExtractionController : ViewModelBase
     }
 
     public bool IsBusy { get => _isBusy; set => SetProperty(ref _isBusy, value); }
-    public bool IsPaused { get => _isPaused; set => SetProperty(ref _isPaused, value); }
     public string StatusMessage { get => _statusMessage; set => SetProperty(ref _statusMessage, value); }
     public double Progress { get => _progress; set => SetProperty(ref _progress, value); }
     public string LogText { get => _logText; set => SetProperty(ref _logText, value); }
@@ -70,14 +67,12 @@ public sealed class ExtractionController : ViewModelBase
 
     public ICommand StartCommand { get; }
     public ICommand StopCommand { get; }
-    public ICommand PauseResumeCommand { get; }
     public ICommand LoadLatestCommand { get; }
 
     private ExtractionController()
         {
             StartCommand = new AsyncRelayCommand(StartExtractionAsync, () => !IsBusy);
             StopCommand = new RelayCommand(StopExtraction, () => IsBusy);
-            PauseResumeCommand = new RelayCommand(PauseResume);
             LoadLatestCommand = new RelayCommand(LoadLatest);
 
             // Default output path
@@ -93,9 +88,7 @@ public sealed class ExtractionController : ViewModelBase
     private async Task StartExtractionAsync()
     {
         IsBusy = true;
-        IsPaused = false;
         _cts = new CancellationTokenSource();
-        _pauseEvent = new ManualResetEventSlim(true);
 
         try
         {
@@ -169,12 +162,9 @@ public sealed class ExtractionController : ViewModelBase
         finally
         {
             IsBusy = false;
-            IsPaused = false;
             Progress = 0;
             _cts?.Dispose();
             _cts = null;
-            _pauseEvent?.Dispose();
-            _pauseEvent = null;
         }
     }
 
@@ -220,13 +210,10 @@ public sealed class ExtractionController : ViewModelBase
             foreach (var apiCase in casesToProcess)
             {
                 _cts?.Token.ThrowIfCancellationRequested();
-                _pauseEvent?.Wait(_cts?.Token ?? CancellationToken.None);
 
                 processed++;
                 Progress = (double)processed / total * 100;
-                StatusMessage = IsPaused
-                    ? $"متوقف شده — {processed}/{total}"
-                    : $"استخراج {processed}/{total}";
+                StatusMessage = $"استخراج {processed}/{total}";
 
                 var serial = NezamApiClient.S(apiCase, "das_serial");
                 var caseNum = $"{NezamApiClient.S(apiCase, "das_year")}/{NezamApiClient.S(apiCase, "das_number")}";
@@ -334,7 +321,6 @@ public sealed class ExtractionController : ViewModelBase
             for (int i = 0; i < cases.Count; i++)
             {
                 _cts?.Token.ThrowIfCancellationRequested();
-                _pauseEvent?.Wait(_cts?.Token ?? CancellationToken.None);
 
                 var c = cases[i];
                 StatusMessage = $"گزارش {i + 1}/{cases.Count}";
@@ -377,7 +363,6 @@ public sealed class ExtractionController : ViewModelBase
     private void StopExtraction()
     {
         _cts?.Cancel();
-        _pauseEvent?.Set();
         StatusMessage = "در حال توقف...";
     }
 
@@ -486,25 +471,6 @@ public sealed class ExtractionController : ViewModelBase
         catch (Exception ex)
         {
             AppendLog($"خطای دانلود فایل‌ها: {ex.Message}");
-        }
-    }
-
-    private void PauseResume()
-    {
-        if (_pauseEvent == null) return;
-        if (IsPaused)
-        {
-            _pauseEvent.Set();
-            IsPaused = false;
-            AppendLog("▶ ادامه استخراج");
-            StatusMessage = "در حال استخراج...";
-        }
-        else
-        {
-            _pauseEvent.Reset();
-            IsPaused = true;
-            AppendLog("⏸ وقفه");
-            StatusMessage = "متوقف شده...";
         }
     }
 

@@ -98,8 +98,6 @@
                             <TextBlock Text="توقف" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <Button x:Name="BtnPause" Style="{StaticResource ExtractionBtn}" Width="130"
-                            Background="#F39C12" Content="⏸ وقفه" Click="BtnPause_Click"/>
                     <Button x:Name="BtnLoad" Style="{StaticResource ExtractionBtn}" Width="180"
                             Background="#3498DB" Click="BtnLoad_Click">
                         <StackPanel Orientation="Horizontal">

@@ -29,8 +29,6 @@ public sealed class UpdateViewModel : ViewModelBase
     private bool _extractReports = true;
 
     private CancellationTokenSource? _cts;
-    private ManualResetEventSlim? _pauseEvent;
-    private bool _isPaused;
 
     public string StatusMessage { get => _statusMessage; set => SetProperty(ref _statusMessage, value); }
     public double Progress { get => _progress; set => SetProperty(ref _progress, value); }
@@ -45,7 +43,6 @@ public sealed class UpdateViewModel : ViewModelBase
     public SyncResult? LastResult { get => _lastResult; set => SetProperty(ref _lastResult, value); }
     public bool IsConnected { get => _isConnected; set => SetProperty(ref _isConnected, value); }
     public bool RememberMe { get => _rememberMe; set => SetProperty(ref _rememberMe, value); }
-    public bool IsPaused { get => _isPaused; set => SetProperty(ref _isPaused, value); }
 
     public int StartFromIndex { get => _startFromIndex; set => SetProperty(ref _startFromIndex, value); }
     public bool ExtractEngineers { get => _extractEngineers; set => SetProperty(ref _extractEngineers, value); }
@@ -56,7 +53,6 @@ public sealed class UpdateViewModel : ViewModelBase
 
     public ICommand SyncCommand { get; }
     public ICommand StopCommand { get; }
-    public ICommand PauseResumeCommand { get; }
     public ICommand LoadLatestCommand { get; }
 
     public UpdateViewModel(NezamDatabase db)
@@ -64,7 +60,6 @@ public sealed class UpdateViewModel : ViewModelBase
         _db = db;
         SyncCommand = new AsyncRelayCommand(ExecuteSyncAsync, () => !IsBusy);
         StopCommand = new RelayCommand(StopSync, () => IsBusy);
-        PauseResumeCommand = new RelayCommand(PauseResume, () => IsBusy);
         LoadLatestCommand = new RelayCommand(LoadLatest, () => !IsBusy);
 
         var settings = _db.LoadSettings();
@@ -75,10 +70,8 @@ public sealed class UpdateViewModel : ViewModelBase
     private async Task ExecuteSyncAsync()
     {
         IsBusy = true;
-        IsPaused = false;
         LogText = "";
         _cts = new CancellationTokenSource();
-        _pauseEvent = new ManualResetEventSlim(true); // Start unpaused
 
         try
         {
@@ -120,7 +113,6 @@ public sealed class UpdateViewModel : ViewModelBase
 
                 AppendLog("تعداد کل پرونده‌ها: ۷۱ (طبق جدول سایت)");
 
-                // Configure extraction options
                 var options = new ExtractionOptions
                 {
                     StartFromIndex = StartFromIndex,
@@ -130,7 +122,6 @@ public sealed class UpdateViewModel : ViewModelBase
                     UpdateAllSpecifications = UpdateAllSpecifications,
                     ExtractReports = ExtractReports,
                     CancellationTokenSource = _cts,
-                    PauseEvent = _pauseEvent,
                 };
 
                 AppendLog($"شروع از پرونده: {StartFromIndex + 1}");
@@ -142,7 +133,6 @@ public sealed class UpdateViewModel : ViewModelBase
                 AppendLog($"گزارش‌ها: {(ExtractReports ? "✓" : "✗")}");
                 AppendLog("─".PadRight(40));
 
-                // Run extraction
                 StatusMessage = "در حال استخراج...";
                 var startTime = DateTime.Now;
 
@@ -152,9 +142,7 @@ public sealed class UpdateViewModel : ViewModelBase
                     (current, total) =>
                     {
                         Progress = (double)current / total * 100;
-                        StatusMessage = IsPaused
-                            ? $"متوقف شده — {current}/{total}"
-                            : $"استخراج {current}/{total}";
+                        StatusMessage = $"استخراج {current}/{total}";
                     });
 
                 var elapsed = DateTime.Now - startTime;
@@ -163,7 +151,6 @@ public sealed class UpdateViewModel : ViewModelBase
                 AppendLog($"تعداد: {cases.Count} پرونده");
                 AppendLog($"مدت: {elapsed.TotalSeconds:F1} ثانیه");
 
-                // Save to database
                 if (cases.Count > 0)
                 {
                     AppendLog("ذخیره در دیتابیس...");
@@ -171,26 +158,6 @@ public sealed class UpdateViewModel : ViewModelBase
                     _db.SaveSnapshot(snapshotId, cases);
                     _db.FinalizeSnapshot(snapshotId, cases.Count);
                     AppendLog($"ذخیره شد (snapshot #{snapshotId}) ✓");
-                }
-
-                // Generate Excel
-                if (cases.Count > 0)
-                {
-                    try
-                    {
-                        var exportDir = System.IO.Path.Combine(
-                            AppDomain.CurrentDomain.BaseDirectory, "exports");
-                        System.IO.Directory.CreateDirectory(exportDir);
-                        var excelPath = System.IO.Path.Combine(exportDir,
-                            $"Cases_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
-                        NezamMonitor.Core.Excel.ExcelExporter.GenerateFullWorkbook(cases, excelPath);
-                        AppendLog("فایل Excel ایجاد شد:");
-                        AppendLog(excelPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        AppendLog($"خطا در ایجاد Excel: {ex.Message}");
-                    }
                 }
 
                 StatusMessage = $"تکمیل — {cases.Count} پرونده در {elapsed.TotalSeconds:F0} ثانیه";
@@ -218,41 +185,15 @@ public sealed class UpdateViewModel : ViewModelBase
         finally
         {
             IsBusy = false;
-            IsPaused = false;
             Progress = 0;
             _cts?.Dispose();
             _cts = null;
-            _pauseEvent?.Dispose();
-            _pauseEvent = null;
-        }
-    }
-
-    private void PauseResume()
-    {
-        if (_pauseEvent == null) return;
-
-        if (IsPaused)
-        {
-            // Resume
-            _pauseEvent.Set();
-            IsPaused = false;
-            AppendLog("▶ ادامه استخراج");
-            StatusMessage = "در حال استخراج...";
-        }
-        else
-        {
-            // Pause
-            _pauseEvent.Reset();
-            IsPaused = true;
-            AppendLog("⏸ وقفه در استخراج");
-            StatusMessage = "متوقف شده...";
         }
     }
 
     private void StopSync()
     {
         _cts?.Cancel();
-        _pauseEvent?.Set(); // Unblock if paused so cancellation can proceed
         StatusMessage = "در حال توقف...";
     }
 
