@@ -56,7 +56,13 @@ public sealed class ExtractionController : ViewModelBase
     private bool _extractReportFiles = false;
     public bool ExtractReportFiles { get => _extractReportFiles; set => SetProperty(ref _extractReportFiles, value); }
     private string _outputPath = "";
-    public string OutputPath { get => _outputPath; set => SetProperty(ref _outputPath, value); }
+        public string OutputPath { get => _outputPath; set => SetProperty(ref _outputPath, value); }
+        private string _username = "";
+        public string Username { get => _username; set => SetProperty(ref _username, value); }
+        private string _password = "";
+        public string Password { get => _password; set => SetProperty(ref _password, value); }
+        private bool _rememberMe = false;
+        public bool RememberMe { get => _rememberMe; set => SetProperty(ref _rememberMe, value); }
     private bool _updateAllSpecifications = true;
     public bool UpdateAllSpecifications { get => _updateAllSpecifications; set => SetProperty(ref _updateAllSpecifications, value); }
     private int _startFromIndex = 1;
@@ -94,11 +100,25 @@ public sealed class ExtractionController : ViewModelBase
         try
         {
             var db = DatabaseService.Instance;
-            var username = "";
-            var password = "";
-            var settings = db.LoadSettings();
-            if (settings.TryGetValue("username", out var u)) username = u;
-            if (settings.TryGetValue("password", out var p)) password = p;
+
+            // Use credentials from UI (Username/Password properties)
+            // Fall back to database if UI is empty
+            var username = Username;
+            var password = Password;
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                var settings = db.LoadSettings();
+                if (settings.TryGetValue("username", out var u)) username = u;
+                if (settings.TryGetValue("password", out var p)) password = p;
+            }
+
+            // Save credentials for next time if RememberMe is checked
+            if (RememberMe && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            {
+                db.SaveSetting("username", username);
+                db.SaveSetting("password", password);
+                db.SaveSetting("remember_me", "true");
+            }
 
             AppendLog("شروع استخراج API...");
 
@@ -174,6 +194,9 @@ public sealed class ExtractionController : ViewModelBase
                 return cases;
             }
             AppendLog($"ورود API موفق ✓ (userId={api.UserId})");
+
+            // Save token for next launch
+            db.SaveSetting("api_token", api.Token);
 
             // Get all cases
             StatusMessage = "دریافت لیست پرونده‌ها...";
@@ -369,6 +392,9 @@ public sealed class ExtractionController : ViewModelBase
             var loginResp = await http.SendAsync(loginReq);
             var token = System.Text.Json.JsonDocument.Parse(await loginResp.Content.ReadAsStringAsync()).RootElement.GetProperty("token").GetString()!;
             http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(token);
+
+            // Save token for next launch (so we don't need to login again)
+            DatabaseService.Instance.SaveSetting("api_token", token);
 
             var userResp = await http.GetAsync("http://service.yazdnezam.ir:8033/panel/api/user");
             var userJson = System.Text.Json.JsonDocument.Parse(await userResp.Content.ReadAsStringAsync());

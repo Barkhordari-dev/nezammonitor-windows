@@ -77,6 +77,11 @@ public partial class UpdateView : UserControl
     private async void BtnStart_Click(object sender, RoutedEventArgs e)
     {
         var ec = ExtractionController.Instance;
+        // Pass credentials from UI to ExtractionController
+        ec.Username = DataContext is ViewModels.UpdateViewModel vm ? vm.Username : "";
+        ec.Password = DataContext is ViewModels.UpdateViewModel vm2 ? vm2.Password : "";
+        ec.RememberMe = DataContext is ViewModels.UpdateViewModel vm3 ? vm3.RememberMe : false;
+        
         if (ec.StartCommand is ViewModels.AsyncRelayCommand asyncCmd)
             await asyncCmd.ExecuteAsync();
     }
@@ -100,14 +105,20 @@ public partial class UpdateView : UserControl
 
     private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
     {
-        // Save password when RememberMe is checked
-        if (PasswordBox.IsLoaded && PasswordBox.Password.Length > 0)
+        // Always sync password to ViewModel
+        if (PasswordBox.IsLoaded)
         {
-            var db = DatabaseService.Instance;
-            var rememberMe = db.GetSetting("remember_me");
-            if (rememberMe == "true")
+            _vm.Password = PasswordBox.Password;
+
+            // Save password when RememberMe is checked
+            if (PasswordBox.Password.Length > 0)
             {
-                db.SaveSetting("password", PasswordBox.Password);
+                var db = DatabaseService.Instance;
+                var rememberMe = db.GetSetting("remember_me");
+                if (rememberMe == "true")
+                {
+                    db.SaveSetting("password", PasswordBox.Password);
+                }
             }
         }
     }

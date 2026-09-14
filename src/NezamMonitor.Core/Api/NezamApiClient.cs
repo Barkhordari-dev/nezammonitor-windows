@@ -6,6 +6,7 @@ public sealed class NezamApiClient : IDisposable
 {
     private readonly HttpClient _http;
     private string _token = "";
+    public string Token => _token;
     private int _userId;
     private int _cityId;
 

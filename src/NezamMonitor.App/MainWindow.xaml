@@ -64,7 +64,7 @@
                            RenderOptions.BitmapScalingMode="HighQuality"/>
                     <TextBlock Text="نسخه ۲.۰.۰" Foreground="#7F8C8D" FontSize="{DynamicResource FontSize}"
                                HorizontalAlignment="Center" Margin="0,0,0,3"/>
-                    <TextBlock Text="ساخته شده توسط محمد مهدی برخورداری"
+                    <TextBlock Text="تولید شده توسط مهندس برخورداری"
                                Foreground="#7F8C8D" FontSize="{DynamicResource FontSize}"
                                HorizontalAlignment="Center" TextAlignment="Center"
                                TextWrapping="Wrap" Margin="0,0,0,5"/>
