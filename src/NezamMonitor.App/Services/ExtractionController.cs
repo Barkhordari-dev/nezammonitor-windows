@@ -137,11 +137,17 @@ public sealed class ExtractionController : ViewModelBase
 
             if (cases.Count > 0)
             {
-                var snapshotId = db.CreateSnapshot(startTime);
-                db.SaveSnapshot(snapshotId, cases);
-                db.FinalizeSnapshot(snapshotId, cases.Count);
-                db.SetActiveSnapshot(snapshotId);
-                AppendLog($"ذخیره شد (snapshot #{snapshotId}) ✓ — {cases.Count} پرونده فعال شد");
+                AppendLog("ذخیره در دیتابیس...");
+                StatusMessage = "ذخیره اسنپشات...";
+                // Run DB save on background thread to avoid UI freeze
+                await Task.Run(() =>
+                {
+                    var snapshotId = db.CreateSnapshot(startTime);
+                    db.SaveSnapshot(snapshotId, cases);
+                    db.FinalizeSnapshot(snapshotId, cases.Count);
+                    db.SetActiveSnapshot(snapshotId);
+                });
+                AppendLog($"ذخیره شد ✓ — {cases.Count} پرونده فعال شد");
             }
             else
             {
