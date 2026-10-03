@@ -206,7 +206,7 @@ public sealed class AndroidExportEngine
                 {
                     Discipline = f.Discipline,
                     ServiceType = svc,
-                    Stage = f.Stage,
+                    Stage = f.Stage ?? "",
                     StartDate = f.StartDate,
                     EndDate = f.EndDate,
                     Amount = f.Amount,
@@ -269,6 +269,13 @@ public sealed class AndroidExportEngine
         return data;
     }
 
+    private static long ParseAmountForExport(string amount)
+    {
+        if (string.IsNullOrWhiteSpace(amount)) return 0;
+        var s = amount.Replace("ریال", "").Replace(",", "").Replace("٬", "").Replace("،", "").Replace(" ", "").Trim();
+        s = s.Replace("۰","0").Replace("۱","1").Replace("۲","2").Replace("۳","3").Replace("۴","4").Replace("۵","5").Replace("۶","6").Replace("۷","7").Replace("۸","8").Replace("۹","9").Replace("٠","0").Replace("١","1").Replace("٢","2").Replace("٣","3").Replace("٤","4").Replace("٥","5").Replace("٦","6").Replace("٧","7").Replace("٨","8").Replace("٩","9");
+        return long.TryParse(s, out var v) ? v : 0;
+    }
     private static void AddEntry(ZipArchive zip, string entryName, string content)
     {
         var entry = zip.CreateEntry(entryName, CompressionLevel.Optimal);
