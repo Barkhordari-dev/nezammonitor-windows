@@ -36,12 +36,14 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/v')
       shell: pwsh
       run: |
-        # فقط فایل‌های لازم برای اجرا — templates کنار exe
         if (Test-Path "src/templates") { Copy-Item "src/templates" "publish/templates" -Recurse -Force }
         elseif (Test-Path "release/templates") { Copy-Item "release/templates" "publish/templates" -Recurse -Force }
         Get-ChildItem publish | Format-Table Name, Length
         $exe = Get-ChildItem publish/*.exe | Select-Object -First 1
         Write-Host "EXE size MB: $([math]::Round($exe.Length/1MB,1))"
+        # ZIP کم‌حجم برای دانلود (exe + templates) — نام انگلیسی برای پرهیز از باگ آپلود فارسی
+        Compress-Archive -Path publish/* -DestinationPath "publish/NezamMonitor-Windows.zip" -Force
+        Get-Item "publish/NezamMonitor-Windows.zip" | Format-Table Name, Length
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
@@ -55,7 +57,7 @@ jobs:
       with:
         files: |
           publish/*.exe
-          publish/templates/*.docx
+          publish/NezamMonitor-Windows.zip
         draft: false
         prerelease: false
         generate_release_notes: true
