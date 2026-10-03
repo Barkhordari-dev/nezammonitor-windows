@@ -27,11 +27,16 @@ public sealed class RelayCommand : ICommand
 
 public sealed class RelayCommand<T> : ICommand
 {
-    private readonly Action<T> _execute;
+    private readonly Action<T?> _execute;
     private readonly Func<bool>? _canExecute;
     public event EventHandler? CanExecuteChanged;
-    public RelayCommand(Action<T> execute, Func<bool>? canExecute = null) { _execute = execute; _canExecute = canExecute; }
+    public RelayCommand(Action<T?> execute, Func<bool>? canExecute = null) { _execute = execute; _canExecute = canExecute; }
     public bool CanExecute(object? parameter) => _canExecute?.Invoke() ?? true;
-    public void Execute(object? parameter) { if (parameter is T t) _execute(t); }
+    public void Execute(object? parameter)
+    {
+        if (parameter is T t) _execute(t);
+        else if (parameter == null) _execute(default);
+        else if (parameter is T nullable) _execute(nullable);
+    }
     public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }

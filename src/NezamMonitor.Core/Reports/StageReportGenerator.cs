@@ -303,6 +303,11 @@ public class StageReportGenerator
     /// <summary>
     /// Find template file by stage.
     /// </summary>
+    public string? FindTemplateForStage(int stage)
+    {
+        return FindTemplate(stage);
+    }
+
     private string? FindTemplate(int stage)
     {
         var stageWord = StageReportRules.StageName(stage);
@@ -414,6 +419,15 @@ public class StageReportGenerator
             ["«ناظر_مکانیک»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("مکانیک") || e.Discipline.Contains("مكانيك"))?.Name ?? "",
             ["«ناظر_برق»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("برق"))?.Name ?? "",
             ["«هماهنگکننده»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("هماهنگ"))?.Name ?? "",
+            // فیلدهای جدید: شماره تماس و صلاحیت ناظرین
+            ["«تلفن_ناظر_معماری»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("معمار"))?.Phone ?? "",
+            ["«تلفن_ناظر_عمران»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("عمران"))?.Phone ?? "",
+            ["«تلفن_ناظر_مکانیک»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("مکانیک") || e.Discipline.Contains("مكانيك"))?.Phone ?? "",
+            ["«تلفن_ناظر_برق»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("برق"))?.Phone ?? "",
+            ["«صلاحیت_ناظر_معماری»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("معمار"))?.SupervisionLevel ?? "",
+            ["«صلاحیت_ناظر_عمران»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("عمران"))?.SupervisionLevel ?? "",
+            ["«صلاحیت_ناظر_مکانیک»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("مکانیک") || e.Discipline.Contains("مكانيك"))?.SupervisionLevel ?? "",
+            ["«صلاحیت_ناظر_برق»"] = engineers.FirstOrDefault(e => e.Discipline.Contains("برق"))?.SupervisionLevel ?? "",
         };
 
         // Also add trailing-space variants (Word may add spaces)

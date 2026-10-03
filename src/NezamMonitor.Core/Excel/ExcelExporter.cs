@@ -72,7 +72,8 @@ public static class ExcelExporter
 
     private static void WriteCases(IXLWorksheet ws, IReadOnlyList<Case> cases)
     {
-        string[] h = { "ردیف", "سریال", "پرونده", "مالک", "همراه", "نوع کاربری", "گروه ساختمانی", "کد نوسازی",
+        string[] h = { "ردیف", "سریال", "پرونده", "مالک", "همراه", "نام پدر", "کد ملی", "تلفن مالک", "آدرس مالک", "کد پستی", "زادگاه",
+            "نوع کاربری", "گروه ساختمانی", "کد نوسازی",
             "شماره دستور نقشه", "نوع دستور نقشه", "تاریخ دستور نقشه",
             "نوع سازه", "عنوان بلوک", "تعداد بلوک", "طبقات", "واحد",
             "صادرکننده", "پروانه", "تاریخ پروانه", "تاریخ ترخیص",
@@ -86,28 +87,34 @@ public static class ExcelExporter
             ApplyData(ws.Cell(r + 2, 3), c.CaseNumber);
             ApplyData(ws.Cell(r + 2, 4), c.Owner);
             ApplyData(ws.Cell(r + 2, 5), c.OwnerMobile);
-            ApplyData(ws.Cell(r + 2, 6), s?.UsageType);
-            ApplyData(ws.Cell(r + 2, 7), s?.BuildingGroup);
-            ApplyData(ws.Cell(r + 2, 8), s?.RenovationCode);
-            ApplyData(ws.Cell(r + 2, 9), s?.PlanInstructionNo);
-            ApplyData(ws.Cell(r + 2, 10), s?.PlanInstructionType);
-            ApplyData(ws.Cell(r + 2, 11), s?.PlanInstructionDate);
-            ApplyData(ws.Cell(r + 2, 12), s?.StructureType);
-            ApplyData(ws.Cell(r + 2, 13), s?.BlockTitle);
-            ApplyData(ws.Cell(r + 2, 14), s?.BlockCount);
-            ApplyData(ws.Cell(r + 2, 15), s?.Floors);
-            ApplyData(ws.Cell(r + 2, 16), s?.Units);
-            ApplyData(ws.Cell(r + 2, 17), s?.Issuer);
-            ApplyData(ws.Cell(r + 2, 18), s?.PermitNumber);
-            ApplyData(ws.Cell(r + 2, 19), s?.PermitDate);
-            ApplyData(ws.Cell(r + 2, 20), s?.ReleaseDate);
-            ApplyData(ws.Cell(r + 2, 21), s?.LandArea);
-            ApplyData(ws.Cell(r + 2, 22), s?.ParafArea);
-            ApplyData(ws.Cell(r + 2, 23), s?.Address);
-            ApplyData(ws.Cell(r + 2, 24), s?.PlanZone);
-            ApplyData(ws.Cell(r + 2, 25), c.Office);
-            ApplyData(ws.Cell(r + 2, 26), c.CapacityDate);
-            ApplyData(ws.Cell(r + 2, 27), c.Responsibility);
+            ApplyData(ws.Cell(r + 2, 6), c.OwnerFather);
+            ApplyData(ws.Cell(r + 2, 7), c.OwnerNationalCode);
+            ApplyData(ws.Cell(r + 2, 8), c.OwnerTel);
+            ApplyData(ws.Cell(r + 2, 9), c.OwnerAddress);
+            ApplyData(ws.Cell(r + 2, 10), c.OwnerZip);
+            ApplyData(ws.Cell(r + 2, 11), c.OwnerBirthLoc);
+            ApplyData(ws.Cell(r + 2, 12), s?.UsageType);
+            ApplyData(ws.Cell(r + 2, 13), s?.BuildingGroup);
+            ApplyData(ws.Cell(r + 2, 14), s?.RenovationCode);
+            ApplyData(ws.Cell(r + 2, 15), s?.PlanInstructionNo);
+            ApplyData(ws.Cell(r + 2, 16), s?.PlanInstructionType);
+            ApplyData(ws.Cell(r + 2, 17), s?.PlanInstructionDate);
+            ApplyData(ws.Cell(r + 2, 18), s?.StructureType);
+            ApplyData(ws.Cell(r + 2, 19), s?.BlockTitle);
+            ApplyData(ws.Cell(r + 2, 20), s?.BlockCount);
+            ApplyData(ws.Cell(r + 2, 21), s?.Floors);
+            ApplyData(ws.Cell(r + 2, 22), s?.Units);
+            ApplyData(ws.Cell(r + 2, 23), s?.Issuer);
+            ApplyData(ws.Cell(r + 2, 24), s?.PermitNumber);
+            ApplyData(ws.Cell(r + 2, 25), s?.PermitDate);
+            ApplyData(ws.Cell(r + 2, 26), s?.ReleaseDate);
+            ApplyData(ws.Cell(r + 2, 27), s?.LandArea);
+            ApplyData(ws.Cell(r + 2, 28), s?.ParafArea);
+            ApplyData(ws.Cell(r + 2, 29), s?.Address);
+            ApplyData(ws.Cell(r + 2, 30), s?.PlanZone);
+            ApplyData(ws.Cell(r + 2, 31), c.Office);
+            ApplyData(ws.Cell(r + 2, 32), c.CapacityDate);
+            ApplyData(ws.Cell(r + 2, 33), c.Responsibility);
         }
         for (int c = 1; c <= h.Length; c++) ws.Column(c).Width = 16;
         ws.RangeUsed()?.SetAutoFilter(); ws.SheetView.FreezeRows(1);

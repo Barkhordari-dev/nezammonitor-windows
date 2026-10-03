@@ -135,47 +135,40 @@ public sealed class ThemeManager
         var sidebarOrientation = Orientation.Vertical;
         app.Resources["SidebarOrientation"] = sidebarOrientation;
 
-        // Layout direction
-        var textFlowDirection = theme.LayoutDirection.TextDirection == "LeftToRight"
-            ? System.Windows.FlowDirection.LeftToRight
-            : System.Windows.FlowDirection.RightToLeft;
-        var tableFlowDirection = theme.LayoutDirection.TableDirection == "LeftToRight"
-            ? System.Windows.FlowDirection.LeftToRight
-            : System.Windows.FlowDirection.RightToLeft;
-        var menuFlowDirection = theme.LayoutDirection.MenuDirection == "LeftToRight"
-            ? System.Windows.FlowDirection.LeftToRight
-            : System.Windows.FlowDirection.RightToLeft;
-        var mainWindowFlowDirection = theme.LayoutDirection.MainWindowDirection == "LeftToRight"
-            ? System.Windows.FlowDirection.LeftToRight
-            : System.Windows.FlowDirection.RightToLeft;
+        // Layout direction - فقط Resource ها رو آپدیت کن
+        var dir = theme.LayoutDirection;
+        app.Resources["MainWindowFlowDirection"] = ToFlowDirection(dir.MainWindowDirection);
+        app.Resources["TextFlowDirection"] = ToFlowDirection(dir.TextDirection);
+        app.Resources["TableFlowDirection"] = ToFlowDirection(dir.TableDirection);
+        app.Resources["MenuFlowDirection"] = ToFlowDirection(dir.MenuDirection);
 
-        app.Resources["TextFlowDirection"] = textFlowDirection;
-        app.Resources["TableFlowDirection"] = tableFlowDirection;
-        app.Resources["MenuFlowDirection"] = menuFlowDirection;
-        app.Resources["MainWindowFlowDirection"] = mainWindowFlowDirection;
+        // Language برای BiDi (فارسی)
+        var xmlLang = System.Windows.Markup.XmlLanguage.GetLanguage("fa-IR");
 
-        // Update main window directly
+        // Update sidebar width + Language
         foreach (Window w in app.Windows)
         {
             if (w is MainWindow mw)
             {
-                mw.FlowDirection = mainWindowFlowDirection;
-                var sp = mw.FindName("SidebarStackPanel") as StackPanel;
-                if (sp != null) sp.Orientation = sidebarOrientation;
+                mw.Language = xmlLang;
                 var sb = mw.FindName("SidebarBorder") as Border;
                 if (sb != null) sb.Width = theme.Dimensions.SidebarWidth;
-                // Update sidebar column width via direct grid access
                 try
                 {
                     var mainGrid = mw.Content as System.Windows.Controls.Grid;
                     if (mainGrid != null && mainGrid.ColumnDefinitions.Count > 0)
-                    {
                         mainGrid.ColumnDefinitions[0].Width = new System.Windows.GridLength(theme.Dimensions.SidebarWidth);
-                    }
                 }
                 catch { }
             }
         }
+    }
+
+    private static System.Windows.FlowDirection ToFlowDirection(string value)
+    {
+        return string.Equals(value, "LeftToRight", StringComparison.OrdinalIgnoreCase)
+            ? System.Windows.FlowDirection.LeftToRight
+            : System.Windows.FlowDirection.RightToLeft;
     }
 
     private static Color HexToColor(string hex)

@@ -64,18 +64,32 @@
 
         <!-- DataGrid -->
         <DataGrid Grid.Row="3" x:Name="ReportsGrid" ItemsSource="{Binding Reports}" AutoGenerateColumns="False"
-                  IsReadOnly="True" AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal"
-                  HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
-                  MouseRightButtonUp="ReportsGrid_MouseRightButtonUp" FlowDirection="{DynamicResource TableFlowDirection}">
+                          IsReadOnly="True" AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
+                          MouseRightButtonUp="ReportsGrid_MouseRightButtonUp" FlowDirection="{DynamicResource TableFlowDirection}"
+                          CanUserSortColumns="True">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="📁 باز کردن پوشه"
+                                          Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          CommandParameter="{Binding}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="پرونده" Binding="{Binding CaseNumber}" Width="100"/>
-                <DataGridTextColumn Header="مالک" Binding="{Binding Owner}" Width="120"/>
-                <DataGridTextColumn Header="نوع" Binding="{Binding ReportType}" Width="100"/>
-                <DataGridTextColumn Header="مرحله" Binding="{Binding Stage}" Width="100"/>
-                <DataGridTextColumn Header="ناظر" Binding="{Binding Engineer}" Width="120"/>
-                <DataGridTextColumn Header="رشته" Binding="{Binding Discipline}" Width="80"/>
-                <DataGridTextColumn Header="تاریخ" Binding="{Binding VisitDate}" Width="100"/>
-            </DataGrid.Columns>
+                            <DataGridTextColumn Header="پرونده" Binding="{Binding CaseNumber}" SortMemberPath="CaseNumber" Width="100"/>
+                            <DataGridTextColumn Header="مالک" Binding="{Binding Owner}" SortMemberPath="Owner" Width="120"/>
+                            <DataGridTextColumn Header="نوع" Binding="{Binding ReportType}" SortMemberPath="ReportType" Width="100"/>
+                            <DataGridTextColumn Header="مرحله" Binding="{Binding Stage}" SortMemberPath="Stage" Width="100"/>
+                            <DataGridTextColumn Header="ناظر" Binding="{Binding Engineer}" SortMemberPath="Engineer" Width="120"/>
+                            <DataGridTextColumn Header="رشته" Binding="{Binding Discipline}" SortMemberPath="Discipline" Width="80"/>
+                            <DataGridTextColumn Header="تاریخ" Binding="{Binding VisitDate}" SortMemberPath="VisitDate" Width="100"/>
+                        </DataGrid.Columns>
         </DataGrid>
 
         <TextBlock Grid.Row="4" Text="{Binding StatusMessage}" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" Margin="0,5,0,0"/>

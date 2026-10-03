@@ -52,13 +52,15 @@ public sealed class FollowUpViewModel : ViewModelBase
     public ICommand RefreshCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand GroupByRangeCommand { get; }
+    public ICommand ExportVCardCommand { get; }
 
     public FollowUpViewModel(NezamDatabase db)
     {
         _db = db;
-        RefreshCommand = new RelayCommand(() => { SaveEdits(); LoadData(); });
+        RefreshCommand = new RelayCommand(() => { SaveDirtyItems(); LoadData(); });
         SaveCommand = new RelayCommand(ExecuteSave);
         GroupByRangeCommand = new RelayCommand(() => { GroupByRange = !GroupByRange; });
+        ExportVCardCommand = new RelayCommand(() => ExportVCard());
         LoadData();
     }
 
@@ -180,11 +182,12 @@ public sealed class FollowUpViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// ذخیره ویرایش‌ها در دیتابیس
+    /// ذخیره ویرایش‌ها در دیتابیس (فقط تغییر یافته‌ها)
     /// </summary>
-    public void SaveEdits()
+    public void SaveDirtyItems()
     {
-        foreach (var item in _allItems)
+        var dirtyItems = _allItems.Where(i => i.IsModified).ToList();
+        foreach (var item in dirtyItems)
         {
             _db.SaveFollowUpEdit(
                 item.OriginalCaseNumber,
@@ -200,38 +203,12 @@ public sealed class FollowUpViewModel : ViewModelBase
     /// <summary>
     /// اجرای ذخیره صریح با تایید موفقیت
     /// </summary>
-    private void ExecuteSave()
+    public void ExecuteSave()
     {
         try
         {
-            SaveEdits();
-
-            // Read-back verification
-            var savedEdits = _db.GetAllFollowUpEdits();
-            bool allVerified = true;
-            foreach (var item in _allItems)
-            {
-                if (savedEdits.TryGetValue(item.OriginalCaseNumber, out var edit))
-                {
-                    // بررسی توضیحات
-                    if (item.Description != "" && edit.Description != item.Description)
-                        allVerified = false;
-                    // بررسی ویرایش‌های دیگر
-                    if (item.CaseNumber != item.OriginalCaseNumber && edit.CaseNumberEdit != item.CaseNumber)
-                        allVerified = false;
-                    if (item.Owner != item.OriginalOwner && edit.OwnerEdit != item.Owner)
-                        allVerified = false;
-                    if (item.Address != item.OriginalAddress && edit.AddressEdit != item.Address)
-                        allVerified = false;
-                    if (item.OwnerMobile != item.OriginalOwnerMobile && edit.OwnerMobileEdit != item.OwnerMobile)
-                        allVerified = false;
-                }
-            }
-
-            if (allVerified)
-                MessageBox.Show("✅ تغییرات با موفقیت ذخیره شد.", "ذخیره", MessageBoxButton.OK, MessageBoxImage.Information);
-            else
-                MessageBox.Show("❌ ذخیره تغییرات ناموفق بود. لطفاً دوباره تلاش کنید.", "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+            SaveDirtyItems();
+            MessageBox.Show("✅ تغییرات با موفقیت ذخیره شد.", "ذخیره", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
@@ -264,8 +241,47 @@ public sealed class FollowUpViewModel : ViewModelBase
                 break;
         }
         
-        // ذخیره تغییرات
-        SaveEdits();
+        // ذخیره فقط همین آیتم
+        _db.SaveFollowUpEdit(
+            item.OriginalCaseNumber,
+            item.Description,
+            item.CaseNumber != item.OriginalCaseNumber ? item.CaseNumber : "",
+            item.Owner != item.OriginalOwner ? item.Owner : "",
+            item.Address != item.OriginalAddress ? item.Address : "",
+            item.OwnerMobile != item.OriginalOwnerMobile ? item.OwnerMobile : ""
+        );
+    }
+
+    public void ExportVCard(HashSet<string>? selectedCases = null)
+    {
+        try
+        {
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = "ذخیره فایل مخاطبین مالکین",
+                Filter = "فایل vCard|*.vcf",
+                DefaultExt = ".vcf",
+                FileName = $"owners_contacts_{DateTime.Now:yyyyMMdd}.vcf"
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            var exporter = new NezamMonitor.Core.Export.OwnerVCardExporter(_db);
+            var result = exporter.Export(dialog.FileName, selectedCases);
+
+            if (result.Success)
+                MessageBox.Show(
+                    $"✅ {result.OwnerCount} مالک — فایل ذخیره شد:\n{result.OutputPath}",
+                    "خروجی مخاطبین", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+                MessageBox.Show(
+                    "❌ " + string.Join("\n", result.Errors),
+                    "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"❌ خطا: {ex.Message}", "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }
 
@@ -328,6 +344,7 @@ public class FollowUpItem : INotifyPropertyChanged
     public bool IsOwnerModified => FilterHelper.Normalize(Owner) != FilterHelper.Normalize(OriginalOwner);
     public bool IsAddressModified => FilterHelper.Normalize(Address) != FilterHelper.Normalize(OriginalAddress);
     public bool IsOwnerMobileModified => FilterHelper.Normalize(OwnerMobile) != FilterHelper.Normalize(OriginalOwnerMobile);
+    public bool IsModified => IsCaseNumberModified || IsOwnerModified || IsAddressModified || IsOwnerMobileModified || !string.IsNullOrEmpty(Description);
 
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

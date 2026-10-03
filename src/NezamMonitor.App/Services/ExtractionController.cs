@@ -3,7 +3,6 @@ using NezamMonitor.App.ViewModels;
 using System.Threading;
 using System.Windows.Input;
 using NezamMonitor.Core.Api;
-using NezamMonitor.Core.Browser;
 using NezamMonitor.Core.Data;
 using NezamMonitor.Core.Models;
 
@@ -52,6 +51,8 @@ public sealed class ExtractionController : ViewModelBase
     public bool ExtractReports { get => _extractReports; set => SetProperty(ref _extractReports, value); }
     private bool _extractReportFiles = false;
     public bool ExtractReportFiles { get => _extractReportFiles; set => SetProperty(ref _extractReportFiles, value); }
+    private bool _skipExistingReportFiles = true;
+    public bool SkipExistingReportFiles { get => _skipExistingReportFiles; set => SetProperty(ref _skipExistingReportFiles, value); }
     private string _outputPath = "";
         public string OutputPath { get => _outputPath; set => SetProperty(ref _outputPath, value); }
         private string _username = "";
@@ -294,72 +295,6 @@ public sealed class ExtractionController : ViewModelBase
         return cases;
     }
 
-    /// <summary>
-    /// FALLBACK PATH: Playwright-based Reports extraction only.
-    /// Opens browser, navigates to each case's reports page, extracts report data.
-    /// </summary>
-    private async Task ExtractReportsViaPlaywrightAsync(
-        List<Case> cases, string username, string password, NezamDatabase db)
-    {
-        PlaywrightBrowser? browser = null;
-        try
-        {
-            browser = new PlaywrightBrowser();
-            await browser.LaunchAsync(headless: false);
-            AppendLog("مرورگر برای گزارش‌ها راه‌اندازی شد ✓");
-
-            var scraper = new CaseScraper(browser);
-            var loginOk = await scraper.LoginAsync(username, password);
-            if (!loginOk)
-            {
-                AppendLog("خطا: ورود مرورگر ناموفق — گزارش‌ها استخراج نشد");
-                return;
-            }
-            await scraper.NavigateToTableAsync();
-
-            int reportCount = 0;
-            for (int i = 0; i < cases.Count; i++)
-            {
-                _cts?.Token.ThrowIfCancellationRequested();
-
-                var c = cases[i];
-                StatusMessage = $"گزارش {i + 1}/{cases.Count}";
-
-                try
-                {
-                    var row = await scraper.FindRowForReportsAsync(c.Serial);
-                    if (row == null)
-                    {
-                        AppendLog($"  گزارش: ردیف {c.Serial} پیدا نشد");
-                        continue;
-                    }
-
-                    var reports = await scraper.ExtractReportsFromRowAsync(row);
-                    if (reports.Count > 0)
-                    {
-                        c.Reports = reports;
-                        reportCount += reports.Count;
-                        AppendLog($"  گزارش: {c.CaseNumber} — {reports.Count} گزارش");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    AppendLog($"  گزارش خطا: {c.CaseNumber} - {ex.Message}");
-                }
-            }
-
-            AppendLog($"گزارش‌ها: {reportCount} مورد از {cases.Count} پرونده");
-        }
-        catch (Exception ex)
-        {
-            AppendLog($"خطای مرورگر: {ex.Message}");
-        }
-        finally
-        {
-            browser?.Dispose();
-        }
-    }
-
     private void StopExtraction()
     {
         _cts?.Cancel();
@@ -411,6 +346,7 @@ public sealed class ExtractionController : ViewModelBase
             Directory.CreateDirectory(outputBase);
 
             int totalFiles = 0;
+            int skippedFiles = 0;
             int caseNum = 0;
 
             foreach (var c in cases)
@@ -451,6 +387,27 @@ public sealed class ExtractionController : ViewModelBase
 
                     try
                     {
+                        // Check if file already exists with same size (HEAD request)
+                        if (SkipExistingReportFiles && File.Exists(filePath))
+                        {
+                            try
+                            {
+                                var headReq = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Head, downloadUrl);
+                                var headResp = await http.SendAsync(headReq);
+                                if (headResp.IsSuccessStatusCode && headResp.Content.Headers.ContentLength.HasValue)
+                                {
+                                    var remoteSize = headResp.Content.Headers.ContentLength.Value;
+                                    var localSize = new FileInfo(filePath).Length;
+                                    if (remoteSize == localSize)
+                                    {
+                                        skippedFiles++;
+                                        continue;
+                                    }
+                                }
+                            }
+                            catch { /* HEAD failed — download normally */ }
+                        }
+
                         var resp = await http.GetAsync(downloadUrl);
                         if (resp.IsSuccessStatusCode)
                         {
@@ -463,10 +420,10 @@ public sealed class ExtractionController : ViewModelBase
                 }
 
                 if (caseNum % 10 == 0 || caseNum == cases.Count)
-                    AppendLog($"  فایل‌ها: {caseNum}/{cases.Count} ({totalFiles} فایل)");
+                    AppendLog($"  فایل‌ها: {caseNum}/{cases.Count} (دانلود: {totalFiles} | رد شده: {skippedFiles})");
             }
 
-            AppendLog($"دانلود فایل‌ها: {totalFiles} فایل در {cases.Count} پرونده");
+            AppendLog($"دانلود فایل‌ها: {totalFiles} فایل دانلود شد + {skippedFiles} فایل رد شده (حجم یکسان) از {cases.Count} پرونده");
         }
         catch (Exception ex)
         {

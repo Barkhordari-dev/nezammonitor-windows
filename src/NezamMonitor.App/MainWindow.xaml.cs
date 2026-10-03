@@ -22,13 +22,6 @@ public partial class MainWindow : Window
         _themeManager.LoadTheme();
         _themeManager.ApplyTheme(_themeManager.CurrentTheme);
 
-        // ApplyTheme can't find this window in app.Windows yet (still constructing),
-        // so we must set FlowDirection explicitly here.
-        var dir = _themeManager.CurrentTheme.LayoutDirection;
-        this.FlowDirection = dir.MainWindowDirection == "LeftToRight"
-            ? System.Windows.FlowDirection.LeftToRight
-            : System.Windows.FlowDirection.RightToLeft;
-
         _nav.Register("dashboard", () => new Views.DashboardView());
         _nav.Register("cases", () => new Views.CasesView());
         _nav.Register("update", () => new Views.UpdateView());
@@ -52,5 +45,12 @@ public partial class MainWindow : Window
             _vm.CurrentView = tag;
             _nav.NavigateTo(tag);
         }
+    }
+
+    /// <summary>Public navigation method for child views (e.g. DashboardView quick actions).</summary>
+    public void NavigateTo(string key)
+    {
+        _vm.CurrentView = key;
+        _nav.NavigateTo(key);
     }
 }

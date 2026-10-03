@@ -20,6 +20,12 @@ public sealed class Case
     public string ReportDate1 { get; set; } = "";     // گزارش مرحله ۱
     public string ReportDate2 { get; set; } = "";
     public string ReportDate3 { get; set; } = "";
+    public string OwnerFather { get; set; } = "";         // نام پدر
+    public string OwnerNationalCode { get; set; } = "";   // کد ملی
+    public string OwnerAddress { get; set; } = "";        // آدرس مالک
+    public string OwnerZip { get; set; } = "";            // کد پستی
+    public string OwnerTel { get; set; } = "";            // تلفن
+    public string OwnerBirthLoc { get; set; } = "";       // زادگاه
     public CaseSpecification? Specification { get; set; }
     public List<Engineer> Engineers { get; set; } = new();
     public List<Fee> Fees { get; set; } = new();
@@ -54,7 +60,7 @@ public sealed class CaseSpecification
 }
 
 /// <summary>Responsible engineer/inspector (ناظر).</summary>
-public sealed record Engineer(string Discipline, string Name, string Role = "")
+public sealed record Engineer(string Discipline, string Name, string Role = "", string Phone = "", string DesignLevel = "", string SupervisionLevel = "", string ExecutionLevel = "")
 {
     /// <summary>Stable identity: normalized discipline + name + role.</summary>
     public string Identity => $"{TextNormalizer.Normalize(Discipline)}|{TextNormalizer.Normalize(Name)}|{TextNormalizer.Normalize(Role)}";
@@ -74,6 +80,29 @@ public sealed record Fee(
     string Description = "") // توضیحات
 {
     public string Identity => $"{TextNormalizer.Normalize(Discipline)}|{TextNormalizer.Normalize(ServiceType)}|{TextNormalizer.Normalize(Stage)}|{TextNormalizer.Normalize(AmountType)}";
+}
+
+/// <summary>
+/// آیتم نتیجه اسکن برای ذخیره در دیتابیس (فقط آخرین اسکن)
+/// </summary>
+public class LastScanResultItem
+{
+    public string CaseNumber { get; set; } = "";
+    public int Stage { get; set; }
+    public string Owner { get; set; } = "";
+    public string FullAddress { get; set; } = "";
+    public string PermitNumber { get; set; } = "";
+    public string Companion { get; set; } = "";
+    public string StageName { get; set; } = "";
+    public string Status { get; set; } = "";
+    public string GeneratedAt { get; set; } = "";
+    public string GeneratedAtShamsi { get; set; } = "";
+    public string PermitDate { get; set; } = "";
+    public string Deadline { get; set; } = "";
+    public string DaysRemaining { get; set; } = "";
+    public string DeadlineStatus { get; set; } = "";
+    public string BuildingGroup { get; set; } = "";
+    public bool HasReport { get; set; }
 }
 
 /// <summary>A single report record (گزارش).</summary>

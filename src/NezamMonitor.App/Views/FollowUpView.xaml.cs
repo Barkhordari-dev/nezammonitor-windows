@@ -23,12 +23,20 @@ public partial class FollowUpView : UserControl
     /// </summary>
     private void FollowUpGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
     {
-        if (e.EditAction == DataGridEditAction.Commit)
+        if (e.EditAction == DataGridEditAction.Commit && e.Row.Item is FollowUpItem item)
         {
-            if (DataContext is FollowUpViewModel vm)
+            // ذخیره را عقب بینداز تا binding مقدار جدید را آپدیت کند
+            Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
             {
-                vm.SaveEdits();
-            }
+                NezamMonitor.App.Services.DatabaseService.Instance.SaveFollowUpEdit(
+                    item.OriginalCaseNumber,
+                    item.Description,
+                    item.CaseNumber != item.OriginalCaseNumber ? item.CaseNumber : "",
+                    item.Owner != item.OriginalOwner ? item.Owner : "",
+                    item.Address != item.OriginalAddress ? item.Address : "",
+                    item.OwnerMobile != item.OriginalOwnerMobile ? item.OwnerMobile : ""
+                );
+            }));
         }
     }
 
@@ -130,5 +138,25 @@ public partial class FollowUpView : UserControl
             "توضیحات" => item.Description,
             _ => ""
         };
+    }
+
+    private void ExportVCard_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not FollowUpViewModel vm) return;
+
+        var selectedItems = FollowUpGrid.SelectedItems;
+        var selectedCases = new HashSet<string>();
+
+        if (selectedItems != null && selectedItems.Count > 0)
+        {
+            // Export only selected rows
+            foreach (var item in selectedItems)
+            {
+                if (item is FollowUpItem fi)
+                    selectedCases.Add(fi.OriginalCaseNumber);
+            }
+        }
+        // If nothing selected, export all
+        vm.ExportVCard(selectedCases.Count > 0 ? selectedCases : null);
     }
 }

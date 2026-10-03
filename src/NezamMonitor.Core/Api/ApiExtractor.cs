@@ -26,6 +26,12 @@ public static class ApiExtractor
             ReportDate1 = "",
             ReportDate2 = "",
             ReportDate3 = "",
+            OwnerFather = S(api, "own_father"),
+            OwnerNationalCode = S(api, "own_code_melli"),
+            OwnerAddress = S(api, "own_address"),
+            OwnerZip = S(api, "own_zip"),
+            OwnerTel = S(api, "own_tel"),
+            OwnerBirthLoc = S(api, "own_birth_loc"),
             Specification = MapSpecification(api),
         };
     }

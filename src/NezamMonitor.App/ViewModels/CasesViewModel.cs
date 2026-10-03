@@ -81,14 +81,30 @@ public sealed class CasesViewModel : ViewModelBase
         else
             DetailEngineers = "  (ندارد)";
 
-        // Fees
+        // Fees — نگاشت نوع خدمت مثل منو حق‌الزحمه (به‌جای حروف n/b/ho/t/pn)
         var fees = item.RawCase.Fees;
         if (fees.Count > 0)
         {
+            var stage0 = fees.Where(f => f.Stage?.Trim() == "0").ToList();
+            var amountMap = new Dictionary<Fee, long>();
+            foreach (var f in stage0) amountMap[f] = ParseFeeAmount(f.Amount);
+            var ordered0 = stage0.OrderByDescending(f => amountMap[f]).ToList();
+            string[] order0 = { "حسن انجام کار", "نظارت سهم سازمان", "مالیات نظارت سهم سازمان", "بیمه" };
+            var serviceForFee = new Dictionary<Fee, string>();
+            for (int i = 0; i < ordered0.Count; i++)
+            {
+                string svc = i < order0.Length ? order0[i] : order0[^1];
+                serviceForFee[ordered0[i]] = svc;
+            }
             var lines = fees.Select(f =>
             {
+                string svc;
+                if (f.Stage?.Trim() != "0")
+                    svc = "نظارت";
+                else if (!serviceForFee.TryGetValue(f, out svc!))
+                    svc = "بیمه";
                 var pay = string.IsNullOrEmpty(f.PayStatus) || f.PayStatus == "_" ? "" : $" [{f.PayStatus}]";
-                return $"  {f.AmountType} مرحله {f.Stage}: {f.Amount}{pay}";
+                return $"  {svc} مرحله {f.Stage}: {f.Amount}{pay}";
             });
             DetailFees = string.Join("\n", lines);
         }
@@ -153,6 +169,14 @@ public sealed class CasesViewModel : ViewModelBase
         OnPropertyChanged(nameof(HasDetail));
     }
 
+    private static long ParseFeeAmount(string amount)
+    {
+        if (string.IsNullOrWhiteSpace(amount)) return 0;
+        var cleaned = amount.Replace("ریال", "").Replace(",", "").Replace(" ", "").Trim();
+        cleaned = cleaned.Replace("۰", "0").Replace("۱", "1").Replace("۲", "2").Replace("۳", "3").Replace("۴", "4").Replace("۵", "5").Replace("۶", "6").Replace("۷", "7").Replace("۸", "8").Replace("۹", "9").Replace("٠", "0").Replace("١", "1").Replace("٢", "2").Replace("٣", "3").Replace("٤", "4").Replace("٥", "5").Replace("٦", "6").Replace("٧", "7").Replace("٨", "8").Replace("٩", "9");
+        return long.TryParse(cleaned, out var r) ? r : 0;
+    }
+
     private void FilterCases()
     {
         Cases.Clear();
@@ -169,8 +193,12 @@ public sealed class CasesViewModel : ViewModelBase
 }
 
 /// <summary>Flattened display item that exposes Case + Specification fields for DataGrid binding.</summary>
-public sealed class CaseDisplayItem
+public sealed class CaseDisplayItem : System.ComponentModel.INotifyPropertyChanged
 {
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    private void On(string? n) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(n));
+    private bool _isSelected;
+    public bool IsSelected { get => _isSelected; set { _isSelected = value; On(nameof(IsSelected)); } }
     public Case RawCase { get; }
     public int RowNumber { get; set; }
 
@@ -183,6 +211,12 @@ public sealed class CaseDisplayItem
     public string Responsibility => RawCase.Responsibility;
     public string CapacityDate => RawCase.CapacityDate;
     public string Office => RawCase.Office;
+    public string OwnerFather => RawCase.OwnerFather;
+    public string OwnerNationalCode => RawCase.OwnerNationalCode;
+    public string OwnerAddress => RawCase.OwnerAddress;
+    public string OwnerZip => RawCase.OwnerZip;
+    public string OwnerTel => RawCase.OwnerTel;
+    public string OwnerBirthLoc => RawCase.OwnerBirthLoc;
 
     // Specification fields (flattened)
     public string BuildingGroup => RawCase.Specification?.BuildingGroup ?? "";

@@ -1,4 +1,4 @@
-<UserControl x:Class="NezamMonitor.App.Views.GeneratorView"
+<UserControl x:Class="NezamMonitor.App.Views.GeneratorView" FlowDirection="{DynamicResource MainWindowFlowDirection}"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Margin="15">
@@ -47,30 +47,52 @@
                                     <RowDefinition Height="32"/>
                                     <RowDefinition Height="32"/>
                                     <RowDefinition Height="32"/>
-                                    <RowDefinition Height="32"/>
-                                    <RowDefinition Height="32"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="مرحله:" VerticalAlignment="Center"/>
-                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <RadioButton Content="مرحله اول" IsChecked="True" Margin="0,0,15,0" GroupName="Stage" Tag="1" Checked="StageRadio_Checked"/>
-                                    <RadioButton Content="مرحله دوم" Margin="0,0,15,0" GroupName="Stage" Tag="2" Checked="StageRadio_Checked"/>
-                                    <RadioButton Content="مرحله سوم" GroupName="Stage" Tag="3" Checked="StageRadio_Checked"/>
-                                </StackPanel>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="تمپلیت:" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedTemplateName}" VerticalAlignment="Center" Foreground="#2C3E50" FontWeight="Bold"/>
-                                <Button Grid.Row="1" Grid.Column="2" Content="📂 انتخاب" Command="{Binding BrowseTemplateCommand}" Height="26" Background="#3498DB" Foreground="White" FontSize="{DynamicResource LabelFontSize}"/>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="تاریخ گزارش:" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ReportDate}" VerticalAlignment="Center" Foreground="#27AE60" FontWeight="Bold" FontSize="{DynamicResource FontSize}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="تاریخ گزارش:" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ReportDate}" VerticalAlignment="Center" Foreground="#27AE60" FontWeight="Bold" FontSize="{DynamicResource FontSize}"/>
                                 <!-- LTR Checkbox -->
-                                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding UseLtr}"
+                                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding UseLtr}"
                                           VerticalAlignment="Center" Margin="0,2,0,0">
                                     <TextBlock Text="تولید چپ‌چین">
                                         <TextBlock.ToolTip>برای اعداد و شناسه‌های دارای /، جهت نمایش را چپ‌به‌راست می‌کند تا ترتیب اعداد صحیح نمایش داده شود.</TextBlock.ToolTip>
                                     </TextBlock>
                                 </CheckBox>
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="مسیر خروجی:" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding OutputPath}" VerticalAlignment="Center" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" TextTrimming="CharacterEllipsis"/>
-                                <Button Grid.Row="4" Grid.Column="2" Content="📂 تغییر" Command="{Binding BrowseOutputCommand}" Height="26" Background="#95A5A6" Foreground="White" FontSize="{DynamicResource LabelFontSize}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="مسیر خروجی:" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OutputPath}" VerticalAlignment="Center" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" TextTrimming="CharacterEllipsis"/>
+                                <Button Grid.Row="2" Grid.Column="2" Content="📂 تغییر" Command="{Binding BrowseOutputCommand}" Height="26" Background="#95A5A6" Foreground="White" FontSize="{DynamicResource LabelFontSize}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <!-- Scheduling Card -->
+                    <Border Background="#FFF8E1" CornerRadius="8" Padding="15" Margin="0,0,0,15" BorderBrush="#FFB300" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="⏱ تنظیمات زمان‌بندی گزارش‌ها" FontSize="{DynamicResource FontSize}" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="فاصله گزارش‌ها (گروه الف - ۳ مرحله):" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}" Margin="0,0,0,5"/>
+                                    <ComboBox ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding IntervalGroupA}" Height="28" Width="120" HorizontalAlignment="Left">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding StringFormat='{}{0} ماه'}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="فاصله گزارش‌ها (گروه ب - ۴ مرحله):" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}" Margin="0,0,0,5"/>
+                                    <ComboBox ItemsSource="{Binding MonthOptions}" SelectedItem="{Binding IntervalGroupB}" Height="28" Width="120" HorizontalAlignment="Left">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding StringFormat='{}{0} ماه'}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -92,18 +114,60 @@
                             Visibility="{Binding PreviewText, Converter={StaticResource StringToVisConverter}}">
                         <TextBlock Text="{Binding PreviewText}" FontFamily="Consolas" FontSize="{DynamicResource LabelFontSize}" Foreground="#2C3E50" TextWrapping="Wrap"/>
                     </Border>
+                    <!-- Filters -->
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="فیلتر مرحله:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
+                        <ComboBox Grid.Column="1" SelectedIndex="0" SelectionChanged="FilterStage_Changed" Height="26">
+                            <ComboBoxItem Content="همه مراحل"/>
+                            <ComboBoxItem Content="مرحله اول"/>
+                            <ComboBoxItem Content="مرحله دوم"/>
+                            <ComboBoxItem Content="مرحله سوم"/>
+                        </ComboBox>
+                        <TextBlock Grid.Column="3" Text="فیلتر وضعیت:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
+                        <ComboBox Grid.Column="4" SelectedIndex="0" SelectionChanged="FilterStatus_Changed" Height="26">
+                            <ComboBoxItem Content="همه"/>
+                            <ComboBoxItem Content="⏳ در انتظار"/>
+                            <ComboBoxItem Content="✅ تولید شده"/>
+                        </ComboBox>
+                        <TextBlock Grid.Column="5" Text="{Binding CountDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" FontWeight="Bold"/>
+                    </Grid>
                     <!-- Case Table with Context Menu -->
                     <DataGrid x:Name="CaseGrid" ItemsSource="{Binding ReportStatus}" AutoGenerateColumns="False" IsReadOnly="False"
                               AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal" MaxHeight="350"
                               HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
-                              MouseRightButtonUp="CaseGrid_MouseRightButtonUp" FlowDirection="{DynamicResource TableFlowDirection}">
+                              CanUserSortColumns="True"
+                              MouseRightButtonUp="CaseGrid_MouseRightButtonUp" FlowDirection="{DynamicResource TableFlowDirection}"
+                              RowBackground="White">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChanged}" Value="True">
+                                        <Setter Property="Background" Value="#E8F5E9"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
                         <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Header="انتخاب" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
-                            <DataGridTextColumn Header="ردیف" Binding="{Binding RowNumber}" Width="50" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="مالک" Binding="{Binding Owner}" Width="150" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="شماره پرونده" Binding="{Binding CaseNumber}" Width="100" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="مرحله" Binding="{Binding Stage}" Width="50" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="وضعیت" Binding="{Binding Status}" Width="120" IsReadOnly="True"/>
+                            <DataGridCheckBoxColumn Header="انتخاب" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50" CanUserSort="False"/>
+                            <DataGridTextColumn Header="ردیف" Binding="{Binding RowNumber}" SortMemberPath="RowNumber" Width="40" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="مالک" Binding="{Binding Owner}" SortMemberPath="Owner" Width="130" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="شماره پروانه" Binding="{Binding PermitNumber}" SortMemberPath="PermitNumber" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="مرحله" Binding="{Binding StageName}" SortMemberPath="Stage" Width="60" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="وضعیت" Binding="{Binding Status}" SortMemberPath="Status" Width="100" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="تاریخ تولید" Binding="{Binding GeneratedAt}" SortMemberPath="GeneratedAt" Width="110" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="تاریخ تولید (شمسی)" Binding="{Binding GeneratedAtShamsi}" SortMemberPath="GeneratedAtShamsi" Width="125" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="تاریخ صدور" Binding="{Binding PermitDate}" SortMemberPath="PermitDate" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="مهلت" Binding="{Binding Deadline}" SortMemberPath="Deadline" Width="80" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="مانده" Binding="{Binding DaysRemaining}" SortMemberPath="DaysRemainingSort" Width="110" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="⏰" Binding="{Binding DeadlineStatus}" SortMemberPath="DaysRemainingSort" Width="30" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>
                     <TextBlock Text="{Binding StatusMessage}" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" Margin="0,5,0,0"/>
@@ -118,7 +182,10 @@
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                         <TextBlock Text="📚 گزارش‌های تولیدشده" FontSize="{DynamicResource HeadingFontSize}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,15,0"/>
                         <Button Content="🔄" Command="{Binding RefreshHistoryCommand}" Width="26" Height="26" Background="#3498DB" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <Button Content="🔄 بروزرسانی" Command="{Binding SyncOutputCommand}" Width="90" Height="26" Background="#27AE60" Foreground="White" VerticalAlignment="Center"/>
+                        <Button Content="🔄 بروزرسانی" Command="{Binding SyncOutputCommand}" Width="90" Height="26" Background="#27AE60" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                        <Button Content="☑️ انتخاب همه" Click="History_SelectAll" Width="100" Height="26" Background="#8E44AD" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0" ToolTip="انتخاب همه ردیف‌های جدول"/>
+                        <Button Content="🗑 حذف انتخاب‌شده" Click="History_DeleteSelected" Width="120" Height="26" Background="#E74C3C" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0" ToolTip="حذف لاگ ردیف‌های انتخاب‌شده"/>
+                        <Button Content="🗑 حذف فایل و لاگ" Click="History_DeleteSelectedWithFile" Width="120" Height="26" Background="#C0392B" Foreground="White" VerticalAlignment="Center" ToolTip="حذف فایل و لاگ ردیف‌های انتخاب‌شده"/>
                     </StackPanel>
                     <TextBlock Text="{Binding SyncMessage}" Foreground="#27AE60" FontSize="{DynamicResource LabelFontSize}" FontWeight="Bold" Margin="0,0,0,10" Visibility="{Binding SyncMessage, Converter={StaticResource StringToVisConverter}}"/>
                     <!-- Filters -->
@@ -143,14 +210,27 @@
                     </Grid>
                     <!-- History Table with Context Menu -->
                     <DataGrid x:Name="HistoryGrid" ItemsSource="{Binding ReportHistory}" AutoGenerateColumns="False" IsReadOnly="True"
+                              SelectionMode="Extended"
                               AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal" MaxHeight="400"
                               HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
                               MouseRightButtonUp="HistoryGrid_MouseRightButtonUp" FlowDirection="{DynamicResource TableFlowDirection}">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="📄 باز کردن گزارش" Click="HistoryMenu_OpenReport"/>
+                                <MenuItem Header="📂 باز کردن پوشه" Click="HistoryMenu_OpenFolder"/>
+                                <MenuItem Header="🔄 تولید مجدد" Click="HistoryMenu_Regenerate"/>
+                                <Separator/>
+                                <MenuItem Header="🗑 حذف لاگ انتخاب‌شده" Click="HistoryMenu_DeleteSelected"/>
+                                <MenuItem Header="🗑 حذف فایل و لاگ" Click="HistoryMenu_DeleteWithFile"/>
+                                <Separator/>
+                                <MenuItem Header="📋 کپی مسیر فایل" Click="HistoryMenu_CopyPath"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="مالک" Binding="{Binding OwnerName}" Width="150"/>
                             <DataGridTextColumn Header="پرونده" Binding="{Binding CaseNumber}" Width="100"/>
                             <DataGridTextColumn Header="مرحله" Binding="{Binding StageName}" Width="80"/>
-                            <DataGridTextColumn Header="تاریخ" Binding="{Binding CreatedAt}" Width="100"/>
+                            <DataGridTextColumn Header="تاریخ تولید" Binding="{Binding ReportDate}" Width="110"/>
                             <DataGridTextColumn Header="جهت" Binding="{Binding NumberFormat}" Width="70"/>
                             <DataGridTextColumn Header="فایل" Binding="{Binding FileName}" Width="220"/>
                             <DataGridTextColumn Header="وضعیت" Binding="{Binding Status}" Width="80"/>

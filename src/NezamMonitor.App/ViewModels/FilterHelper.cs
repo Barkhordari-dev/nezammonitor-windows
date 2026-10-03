@@ -32,6 +32,7 @@ public static class FilterHelper
         var values = items
             .Select(selector)
             .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Select(v => v!)
             .Distinct()
             .OrderBy(v => v, StringComparer.OrdinalIgnoreCase)
             .ToList();

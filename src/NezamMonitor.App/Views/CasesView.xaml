@@ -4,73 +4,96 @@
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition x:Name="TableRow" Height="3*"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition x:Name="DetailRow" Height="1*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header: Title + Search + Refresh -->
+        <!-- Header: Title + Search + Copy/Export + Reset + Refresh -->
         <Grid Grid.Row="0" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="📋 پرونده‌ها" FontSize="{DynamicResource HeadingFontSize}" FontWeight="Bold" Margin="0,0,15,0"
                        VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                      Height="30" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
-            <Button Grid.Column="2" Content="🔄" Command="{Binding RefreshCommand}"
+            <Button Grid.Column="2" Content="📋 کپی انتخاب‌شده" Click="CopySelected_Click"
+                    Height="30" Padding="12,0" Margin="0,0,6,0" Background="#1B3147" Foreground="White" FontFamily="B Nazanin" FontSize="12"
+                    ToolTip="ردیف‌های تیک‌خورده را TSV کپی می‌کند (برای Excel)"/>
+            <Button Grid.Column="3" Content="📤 خروجی اکسل" Click="ExportSelected_Click"
+                    Height="30" Padding="12,0" Margin="0,0,6,0" Background="#27AE60" Foreground="White" FontFamily="B Nazanin" FontSize="12"
+                    ToolTip="ردیف‌های تیک‌خورده را به اکسل B Nazanin 14 راست‌چین خروجی می‌دهد — اگر چیزی انتخاب نشده همه فیلتر فعلی"/>
+            <Button Grid.Column="4" Content="↺ چینش پیش‌فرض" Click="ResetColumns_Click"
+                    Height="30" Padding="12,0" Margin="0,0,6,0" Background="#8E44AD" Foreground="White" FontFamily="B Nazanin" FontSize="12"
+                    ToolTip="چیدمان ستون‌ها را به حالت اولیه برمی‌گرداند"/>
+            <Button Grid.Column="5" Content="🔄" Command="{Binding RefreshCommand}"
                     Width="30" Height="30" Background="#3498DB" Foreground="White"/>
         </Grid>
 
-        <!-- Main Table with Horizontal Scroll -->
+        <!-- Main Table -->
         <Border Grid.Row="1" BorderThickness="1" BorderBrush="#DEE2E6" CornerRadius="4">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <DataGrid x:Name="CasesGrid" ItemsSource="{Binding Cases}" AutoGenerateColumns="False"
-                          IsReadOnly="True" AlternatingRowBackground="#F8F9FA" GridLinesVisibility="All"
-                          HeadersVisibility="Column" BorderThickness="0" MinWidth="2200"
-                          SelectionMode="Single" SelectionChanged="CasesGrid_SelectionChanged" FlowDirection="{DynamicResource TableFlowDirection}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ردیف" Binding="{Binding RowNumber}" Width="50"/>
-                        <DataGridTextColumn Header="شماره پرونده" Binding="{Binding CaseNumber}" Width="100"/>
-                        <DataGridTextColumn Header="شماره سریال" Binding="{Binding Serial}" Width="70"/>
-                        <DataGridTextColumn Header="نام مالک" Binding="{Binding Owner}" Width="130"/>
-                        <DataGridTextColumn Header="همراه مالک" Binding="{Binding OwnerMobile}" Width="100"/>
-                        <DataGridTextColumn Header="نوع کاربری" Binding="{Binding UsageType}" Width="80"/>
-                        <DataGridTextColumn Header="گروه ساختمانی" Binding="{Binding BuildingGroup}" Width="90"/>
-                        <DataGridTextColumn Header="کد نوسازی" Binding="{Binding RenovationCode}" Width="120"/>
-                        <DataGridTextColumn Header="شماره دستور نقشه" Binding="{Binding PlanInstructionNo}" Width="100"/>
-                        <DataGridTextColumn Header="نوع دستور نقشه" Binding="{Binding PlanInstructionType}" Width="90"/>
-                        <DataGridTextColumn Header="تاریخ دستور نقشه" Binding="{Binding PlanInstructionDate}" Width="100"/>
-                        <DataGridTextColumn Header="مساحت زمین" Binding="{Binding LandArea}" Width="80"/>
-                        <DataGridTextColumn Header="متراژ پاراف" Binding="{Binding ParafArea}" Width="90"/>
-                        <DataGridTextColumn Header="متراژ کسر ظرفیت" Binding="{Binding CapacityArea}" Width="100"/>
-                        <DataGridTextColumn Header="نوع سازه" Binding="{Binding StructureType}" Width="70"/>
-                        <DataGridTextColumn Header="عنوان بلوک" Binding="{Binding BlockTitle}" Width="80"/>
-                        <DataGridTextColumn Header="تعداد بلوک" Binding="{Binding BlockCount}" Width="70"/>
-                        <DataGridTextColumn Header="طبقات" Binding="{Binding Floors}" Width="50"/>
-                        <DataGridTextColumn Header="واحدها" Binding="{Binding Units}" Width="50"/>
-                        <DataGridTextColumn Header="صادرکننده پروانه" Binding="{Binding Issuer}" Width="110"/>
-                        <DataGridTextColumn Header="شماره پروانه" Binding="{Binding PermitNumber}" Width="90"/>
-                        <DataGridTextColumn Header="تاریخ صدور پروانه" Binding="{Binding PermitDate}" Width="100"/>
-                        <DataGridTextColumn Header="تاریخ ترخیص" Binding="{Binding ReleaseDate}" Width="90"/>
-                        <DataGridTextColumn Header="محدوده طرح" Binding="{Binding PlanZone}" Width="80"/>
-                        <DataGridTextColumn Header="آدرس" Binding="{Binding Address}" Width="150"/>
-                        <DataGridTextColumn Header="دفتر" Binding="{Binding Office}" Width="100"/>
-                        <DataGridTextColumn Header="تاریخ کسر ظرفیت" Binding="{Binding CapacityDate}" Width="100"/>
-                        <DataGridTextColumn Header="مسئولیت" Binding="{Binding Responsibility}" Width="80"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </ScrollViewer>
+            <DataGrid x:Name="CasesGrid" ItemsSource="{Binding Cases}" AutoGenerateColumns="False"
+                      IsReadOnly="False" AlternatingRowBackground="#F8F9FA" GridLinesVisibility="All"
+                      HeadersVisibility="Column" BorderThickness="0" CanUserSortColumns="True"
+                      SelectionMode="Extended" SelectionUnit="FullRow"
+                      PreviewMouseLeftButtonDown="CasesGrid_PreviewMouseLeftButtonDown"
+                      PreviewMouseRightButtonUp="CasesGrid_PreviewMouseRightButtonUp"
+                      SelectionChanged="CasesGrid_SelectionChanged" FlowDirection="{DynamicResource TableFlowDirection}">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="☐" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40" CanUserSort="False"/>
+                    <DataGridTextColumn x:Name="ColRowNumber" Header="ردیف" Binding="{Binding RowNumber}" Width="50" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColCaseNumber" Header="شماره پرونده" Binding="{Binding CaseNumber}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColSerial" Header="شماره سریال" Binding="{Binding Serial}" Width="70" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwner" Header="نام مالک" Binding="{Binding Owner}" Width="130" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwnerMobile" Header="همراه مالک" Binding="{Binding OwnerMobile}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwnerFather" Header="نام پدر" Binding="{Binding OwnerFather}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwnerNationalCode" Header="کد ملی" Binding="{Binding OwnerNationalCode}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwnerTel" Header="تلفن مالک" Binding="{Binding OwnerTel}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwnerAddress" Header="آدرس مالک" Binding="{Binding OwnerAddress}" Width="120" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwnerZip" Header="کد پستی" Binding="{Binding OwnerZip}" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOwnerBirthLoc" Header="زادگاه" Binding="{Binding OwnerBirthLoc}" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColUsageType" Header="نوع کاربری" Binding="{Binding UsageType}" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColBuildingGroup" Header="گروه ساختمانی" Binding="{Binding BuildingGroup}" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColRenovationCode" Header="کد نوسازی" Binding="{Binding RenovationCode}" Width="120" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColPlanInstructionNo" Header="شماره دستور نقشه" Binding="{Binding PlanInstructionNo}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColPlanInstructionType" Header="نوع دستور نقشه" Binding="{Binding PlanInstructionType}" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColPlanInstructionDate" Header="تاریخ دستور نقشه" Binding="{Binding PlanInstructionDate}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColLandArea" Header="مساحت زمین" Binding="{Binding LandArea}" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColParafArea" Header="متراژ پاراف" Binding="{Binding ParafArea}" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColCapacityArea" Header="متراژ کسر ظرفیت" Binding="{Binding CapacityArea}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColStructureType" Header="نوع سازه" Binding="{Binding StructureType}" Width="70" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColBlockTitle" Header="عنوان بلوک" Binding="{Binding BlockTitle}" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColBlockCount" Header="تعداد بلوک" Binding="{Binding BlockCount}" Width="70" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColFloors" Header="طبقات" Binding="{Binding Floors}" Width="50" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColUnits" Header="واحدها" Binding="{Binding Units}" Width="50" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColIssuer" Header="صادرکننده پروانه" Binding="{Binding Issuer}" Width="110" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColPermitNumber" Header="شماره پروانه" Binding="{Binding PermitNumber}" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColPermitDate" Header="تاریخ صدور پروانه" Binding="{Binding PermitDate}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColReleaseDate" Header="تاریخ ترخیص" Binding="{Binding ReleaseDate}" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColPlanZone" Header="محدوده طرح" Binding="{Binding PlanZone}" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColAddress" Header="آدرس" Binding="{Binding Address}" Width="150" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColOffice" Header="دفتر" Binding="{Binding Office}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColCapacityDate" Header="تاریخ کسر ظرفیت" Binding="{Binding CapacityDate}" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn x:Name="ColResponsibility" Header="مسئولیت" Binding="{Binding Responsibility}" Width="80" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Border>
 
-        <!-- Status Bar -->
-        <TextBlock Grid.Row="2" Text="{Binding StatusMessage}" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" Margin="0,5,0,5"/>
+        <!-- GridSplitter - مستقیم بین جدول و جزئیات -->
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"
+                      Background="#BDC3C7" Cursor="SizeNS"
+                      DragCompleted="GridSplitter_DragCompleted"/>
 
-        <!-- Detail Panel (Bottom, Horizontal) -->
-        <Border Grid.Row="3" Background="White" CornerRadius="8" Padding="15"
-                BorderBrush="#BDC3C7" BorderThickness="1" Margin="0,5,0,0"
+        <!-- Detail Panel -->
+        <Border x:Name="DetailPanel" Grid.Row="3" Background="White" CornerRadius="8" Padding="15"
+                BorderBrush="#BDC3C7" BorderThickness="1" FlowDirection="RightToLeft"
                 Visibility="{Binding HasDetail, Converter={StaticResource BoolToVisConverter}}">
             <Grid>
                 <Grid.RowDefinitions>
@@ -88,58 +111,79 @@
                             HorizontalAlignment="Right" Margin="0,0,0,0"/>
                 </StackPanel>
 
-                <!-- 4-Column Horizontal Detail -->
-                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <Grid MinWidth="900">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="220"/>
-                            <ColumnDefinition Width="220"/>
-                            <ColumnDefinition Width="220"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                <!-- 4-Column Horizontal Detail with GridSplitters -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <!-- Column 1: Engineers -->
-                        <Border Grid.Column="0" Background="#EBF5FB" CornerRadius="6" Padding="10" Margin="0,0,5,0">
+                    <!-- Column 1: Engineers -->
+                    <Border Grid.Column="0" Background="#EBF5FB" CornerRadius="6" Padding="10" Margin="0,0,2,0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <TextBlock Text="👷 ناظرین" FontWeight="Bold" FontSize="{DynamicResource FontSize}" Margin="0,0,0,8"
                                            Foreground="#2C3E50"/>
                                 <TextBlock Text="{Binding DetailEngineers}" TextWrapping="Wrap"
                                            FontSize="{DynamicResource FontSize}" Foreground="#34495E" FontFamily="Tahoma"/>
                             </StackPanel>
-                        </Border>
+                        </ScrollViewer>
+                    </Border>
 
-                        <!-- Column 2: Fees -->
-                        <Border Grid.Column="1" Background="#FEF9E7" CornerRadius="6" Padding="10" Margin="2,0">
+                    <!-- GridSplitter 1 -->
+                    <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="#BDC3C7" Cursor="SizeWE"/>
+
+                    <!-- Column 2: Fees -->
+                    <Border Grid.Column="2" Background="#FEF9E7" CornerRadius="6" Padding="10" Margin="2,0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <TextBlock Text="💰 حق‌الزحمه" FontWeight="Bold" FontSize="{DynamicResource FontSize}" Margin="0,0,0,8"
                                            Foreground="#2C3E50"/>
                                 <TextBlock Text="{Binding DetailFees}" TextWrapping="Wrap"
                                            FontSize="{DynamicResource FontSize}" Foreground="#34495E" FontFamily="Tahoma"/>
                             </StackPanel>
-                        </Border>
+                        </ScrollViewer>
+                    </Border>
 
-                        <!-- Column 3: Reports -->
-                        <Border Grid.Column="2" Background="#F5EEF8" CornerRadius="6" Padding="10" Margin="2,0">
+                    <!-- GridSplitter 2 -->
+                    <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="#BDC3C7" Cursor="SizeWE"/>
+
+                    <!-- Column 3: Reports -->
+                    <Border Grid.Column="4" Background="#F5EEF8" CornerRadius="6" Padding="10" Margin="2,0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <TextBlock Text="📄 گزارش‌ها" FontWeight="Bold" FontSize="{DynamicResource FontSize}" Margin="0,0,0,8"
                                            Foreground="#2C3E50"/>
                                 <TextBlock Text="{Binding DetailReports}" TextWrapping="Wrap"
                                            FontSize="{DynamicResource FontSize}" Foreground="#34495E" FontFamily="Tahoma"/>
                             </StackPanel>
-                        </Border>
+                        </ScrollViewer>
+                    </Border>
 
-                        <!-- Column 4: Specifications -->
-                        <Border Grid.Column="3" Background="#E8F8F5" CornerRadius="6" Padding="10" Margin="5,0,0,0">
+                    <!-- GridSplitter 3 -->
+                    <GridSplitter Grid.Column="5" Width="5" HorizontalAlignment="Stretch" Background="#BDC3C7" Cursor="SizeWE"/>
+
+                    <!-- Column 4: Specifications -->
+                    <Border Grid.Column="6" Background="#E8F8F5" CornerRadius="6" Padding="10" Margin="2,0,0,0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <TextBlock Text="📋 مشخصات" FontWeight="Bold" FontSize="{DynamicResource FontSize}" Margin="0,0,0,8"
                                            Foreground="#2C3E50"/>
                                 <TextBlock Text="{Binding DetailSpecs}" TextWrapping="Wrap"
                                            FontSize="{DynamicResource FontSize}" Foreground="#34495E" FontFamily="Tahoma"/>
                             </StackPanel>
-                        </Border>
-                    </Grid>
-                </ScrollViewer>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
             </Grid>
         </Border>
+
+        <!-- Status Bar -->
+        <TextBlock Grid.Row="4" Text="{Binding StatusMessage}" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" Margin="0,5,0,0"/>
     </Grid>
 </UserControl>

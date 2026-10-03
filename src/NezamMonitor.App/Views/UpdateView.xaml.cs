@@ -18,20 +18,35 @@ public partial class UpdateView : UserControl
         _vm = new UpdateViewModel(DatabaseService.Instance);
         DataContext = _vm;
 
-        // Timer updates button states every 500ms
+        // Timer updates button states every 500ms — only runs during extraction
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _uiTimer.Tick += (s, e) => UpdateButtonStates();
 
-        // Start/stop timer based on visibility to prevent leaks & crashes
-        Loaded += (_, _) =>
+        // On enter: one-time state update; timer stays off until extraction starts
+        Loaded += (_, _) => UpdateButtonStates();
+
+        // Unloaded: stop timer if view is removed while extraction is running
+        Unloaded += (_, _) => _uiTimer.Stop();
+
+        // Subscribe to IsBusy changes — start/stop timer automatically
+        ExtractionController.Instance.PropertyChanged += UpdateView_PropertyChanged;
+    }
+
+    private void UpdateView_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ExtractionController.IsBusy))
         {
-            _uiTimer.Start();
-            UpdateButtonStates();
-        };
-        Unloaded += (_, _) =>
-        {
-            _uiTimer.Stop();
-        };
+            if (ExtractionController.Instance.IsBusy)
+            {
+                _uiTimer.Start();
+                UpdateButtonStates();
+            }
+            else
+            {
+                _uiTimer.Stop();
+                UpdateButtonStates();
+            }
+        }
     }
 
     private void UpdateButtonStates()
@@ -42,15 +57,15 @@ public partial class UpdateView : UserControl
             if (ec == null) return;
 
             // Start: enabled only when NOT busy
-            BtnStart.IsEnabled = !ec.IsBusy;
+            if (BtnStart != null) BtnStart.IsEnabled = !ec.IsBusy;
 
             // Stop: enabled only when busy
-            BtnStop.IsEnabled = ec.IsBusy;
+            if (BtnStop != null) BtnStop.IsEnabled = ec.IsBusy;
 
             // Progress + Status
-            ProgressBar.Value = ec.Progress;
-            StatusText.Text = ec.StatusMessage;
-            LogText.Text = ec.LogText;
+            if (ProgressBar != null) ProgressBar.Value = ec.Progress;
+            if (StatusText != null) StatusText.Text = ec.StatusMessage;
+            if (LogText != null) LogText.Text = ec.LogText;
         }
         catch (Exception ex)
         {

@@ -77,6 +77,12 @@
                             Height="28" Padding="10,0" Background="#E74C3C" Foreground="White"
                             FontSize="{DynamicResource ButtonFontSize}" FontWeight="Bold"
                             Visibility="{Binding HasActiveFilters, Converter={StaticResource BoolToVisConverter}}"/>
+                        <Button Content="📥 کلید ورود اطلاعات مهندسین" Command="{Binding ImportFromExcelCommand}"
+                            Height="28" Padding="10,0" Background="#2ECC71" Foreground="White"
+                            FontSize="{DynamicResource ButtonFontSize}" FontWeight="Bold" Margin="10,0,0,0"/>
+                        <Button Content="📱 خروجی مخاطبین" Command="{Binding ExportVCardCommand}"
+                            Height="28" Padding="10,0" Background="#3498DB" Foreground="White"
+                            FontSize="{DynamicResource ButtonFontSize}" FontWeight="Bold" Margin="10,0,0,0"/>
                     </StackPanel>
 
                     <TextBlock Grid.Column="5" Text="{Binding CountDisplay}" VerticalAlignment="Center"
@@ -95,6 +101,10 @@
                 <DataGridTextColumn Header="مالک" Binding="{Binding Owner}" Width="120"/>
                 <DataGridTextColumn Header="رشته" Binding="{Binding Discipline}" Width="80"/>
                 <DataGridTextColumn Header="ناظر" Binding="{Binding Name}" Width="150"/>
+                <DataGridTextColumn Header="تلفن" Binding="{Binding Phone}" Width="110"/>
+                <DataGridTextColumn Header="پایه نظارت" Binding="{Binding SupervisionLevel}" Width="80"/>
+                <DataGridTextColumn Header="پایه طراحی" Binding="{Binding DesignLevel}" Width="80"/>
+                <DataGridTextColumn Header="پایه اجرا" Binding="{Binding ExecutionLevel}" Width="80"/>
             </DataGrid.Columns>
         </DataGrid>
 

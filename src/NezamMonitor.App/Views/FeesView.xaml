@@ -4,137 +4,280 @@
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
-        <TextBlock Grid.Row="0" Text="💰 حق‌الزحمه" FontSize="{DynamicResource HeadingFontSize}" FontWeight="Bold" Margin="0,0,0,10"/>
-
-        <!-- Summary Cards -->
-        <Grid Grid.Row="1" Margin="0,0,0,10">
+        <Grid Grid.Row="0" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Background="#2ECC71" CornerRadius="8" Padding="10" Margin="0,0,5,0">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="پرداخت شده" Foreground="White" FontSize="{DynamicResource LabelFontSize}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding PaidAmount}" Foreground="White" FontSize="{DynamicResource FontSize}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding PaidCount, StringFormat='{}{0} مورد'}" Foreground="#D5F5E3" FontSize="{DynamicResource LogFontSize}" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-            <Border Grid.Column="1" Background="#3498DB" CornerRadius="8" Padding="10" Margin="2,0">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="تایید شده" Foreground="White" FontSize="{DynamicResource LabelFontSize}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding ConfirmedAmount}" Foreground="White" FontSize="{DynamicResource FontSize}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding ConfirmedCount, StringFormat='{}{0} مورد'}" Foreground="#D6EAF8" FontSize="{DynamicResource LogFontSize}" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-            <Border Grid.Column="2" Background="#E67E22" CornerRadius="8" Padding="10" Margin="2,0">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="در انتظار" Foreground="White" FontSize="{DynamicResource LabelFontSize}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding PendingAmount}" Foreground="White" FontSize="{DynamicResource FontSize}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding PendingCount, StringFormat='{}{0} مورد'}" Foreground="#FDEBD0" FontSize="{DynamicResource LogFontSize}" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-            <Border Grid.Column="3" Background="#8E44AD" CornerRadius="8" Padding="10" Margin="5,0,0,0">
-                <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="کل" Foreground="White" FontSize="{DynamicResource LabelFontSize}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding TotalAmount}" Foreground="White" FontSize="{DynamicResource FontSize}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="{Binding TotalCount, StringFormat='{}{0} مورد'}" Foreground="#EBDEF0" FontSize="{DynamicResource LogFontSize}" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <!-- Filter Row 1 -->
-        <Border Grid.Row="2" Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,6"
-                BorderBrush="#DEE2E6" BorderThickness="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="150"/><ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="150"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="🔍 جستجو:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center" Margin="5,0" FontSize="{DynamicResource InputFontSize}"/>
-                <TextBlock Grid.Column="3" Text="مالک:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <ComboBox Grid.Column="4" ItemsSource="{Binding OwnerFilters}" SelectedItem="{Binding FilterOwner}" Height="28" Margin="5,0" FontSize="{DynamicResource InputFontSize}" IsEditable="True" StaysOpenOnEdit="True"/>
-                <TextBlock Grid.Column="6" Text="شماره پرونده:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <ComboBox Grid.Column="7" ItemsSource="{Binding CaseNumberFilters}" SelectedItem="{Binding FilterCaseNumber}" Height="28" Margin="5,0" FontSize="{DynamicResource InputFontSize}" IsEditable="True" StaysOpenOnEdit="True"/>
-                <TextBlock Grid.Column="9" Text="رشته:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <ComboBox Grid.Column="10" ItemsSource="{Binding DisciplineFilters}" SelectedItem="{Binding FilterDiscipline}" Height="28" Margin="5,0" FontSize="{DynamicResource InputFontSize}"/>
-            </Grid>
-        </Border>
-
-        <!-- Filter Row 2 -->
-        <Border Grid.Row="3" Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,8"
-                BorderBrush="#DEE2E6" BorderThickness="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="120"/><ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="80"/><ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="80"/><ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="وضعیت:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding StatusFilters}" SelectedItem="{Binding FilterStatus}" Height="28" Margin="5,0" FontSize="{DynamicResource InputFontSize}"/>
-                <TextBlock Grid.Column="3" Text="مرحله:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <ComboBox Grid.Column="4" ItemsSource="{Binding StageFilters}" SelectedItem="{Binding FilterStage}" Height="28" Margin="5,0" FontSize="{DynamicResource InputFontSize}"/>
-                <TextBlock Grid.Column="6" Text="نوع خدمت:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <ComboBox Grid.Column="7" ItemsSource="{Binding ServiceTypeFilters}" SelectedItem="{Binding FilterServiceType}" Height="28" Margin="5,0" FontSize="{DynamicResource InputFontSize}" IsEditable="True" StaysOpenOnEdit="True"/>
-                <TextBlock Grid.Column="9" Text="مبلغ از:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <TextBox Grid.Column="10" Text="{Binding FilterAmountFrom, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center" Margin="5,0" FontSize="{DynamicResource InputFontSize}"/>
-                <TextBlock Grid.Column="12" Text="تا:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}"/>
-                <TextBox Grid.Column="13" Text="{Binding FilterAmountTo, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center" Margin="5,0" FontSize="{DynamicResource InputFontSize}"/>
-                <Button Grid.Column="15" Content="🧹 پاک کردن فیلترها" Command="{Binding ClearFiltersCommand}"
-                        Height="28" Padding="10,0" Background="#E74C3C" Foreground="White"
-                        FontSize="{DynamicResource ButtonFontSize}" FontWeight="Bold"
-                        Visibility="{Binding HasActiveFilters, Converter={StaticResource BoolToVisConverter}}"/>
-                <TextBlock Grid.Column="17" Text="{Binding CountDisplay}" VerticalAlignment="Center" Foreground="#7F8C8D" FontSize="{DynamicResource FontSize}" FontWeight="Bold"/>
-            </Grid>
-        </Border>
-
-        <!-- DataGrid -->
-        <DataGrid Grid.Row="4" x:Name="FeesGrid" ItemsSource="{Binding Fees}" AutoGenerateColumns="False"
-                  AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal"
-                  HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
-                  MouseRightButtonUp="FeesGrid_MouseRightButtonUp" FlowDirection="{DynamicResource TableFlowDirection}">
-            <DataGrid.Columns>
-                <DataGridCheckBoxColumn Header="انتخاب" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50"/>
-                <DataGridTextColumn Header="پرونده" Binding="{Binding CaseNumber}" Width="100" IsReadOnly="True"/>
-                <DataGridTextColumn Header="مالک" Binding="{Binding Owner}" Width="120" IsReadOnly="True"/>
-                <DataGridTextColumn Header="رشته" Binding="{Binding Discipline}" Width="80" IsReadOnly="True"/>
-                <DataGridTextColumn Header="نوع خدمت" Binding="{Binding ServiceType}" Width="80" IsReadOnly="True"/>
-                <DataGridTextColumn Header="مرحله" Binding="{Binding Stage}" Width="60" IsReadOnly="True"/>
-                <DataGridTextColumn Header="مبلغ" Binding="{Binding Amount}" Width="120" IsReadOnly="True"/>
-                <DataGridTextColumn Header="وضعیت" Binding="{Binding PayStatus}" Width="90" IsReadOnly="True"/>
-                <DataGridTextColumn Header="تایید" Binding="{Binding ConfirmStatus}" Width="90" IsReadOnly="True"/>
-                <DataGridTextColumn Header="شروع" Binding="{Binding StartDate}" Width="90" IsReadOnly="True"/>
-                <DataGridTextColumn Header="پایان" Binding="{Binding EndDate}" Width="90" IsReadOnly="True"/>
-                <DataGridTextColumn Header="توضیحات" Binding="{Binding Description}" Width="150" IsReadOnly="True"/>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <Border Grid.Row="5" Background="#2C3E50" CornerRadius="6" Padding="10" Margin="0,5,0,0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="انتخاب شده:" Foreground="#ECF0F1" FontWeight="Bold" Margin="0,0,10,0"/>
-                <TextBlock Text="{Binding SelectedCount}" Foreground="#2ECC71" FontWeight="Bold" Margin="0,0,5,0"/>
-                <TextBlock Text="مورد | جمع:" Foreground="#ECF0F1" Margin="0,0,10,0"/>
-                <TextBlock Text="{Binding SelectedAmount}" Foreground="#F1C40F" FontWeight="Bold" FontSize="{DynamicResource FontSize}"/>
+            <TextBlock Grid.Column="0" Text="💰 حق‌الزحمه" FontSize="{DynamicResource HeadingFontSize}" FontWeight="Bold"
+                       VerticalAlignment="Center" Margin="0,0,16,0" FontFamily="B Nazanin"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="💰 حق‌الزحمه" Width="120" Height="32" Margin="0,0,6,0"
+                        FontFamily="B Nazanin" FontSize="14" FontWeight="Bold" BorderThickness="1" BorderBrush="#BDC3C7"
+                        Click="TabFee_Click" x:Name="BtnTabFee" Background="#3498DB" Foreground="White"/>
+                <Button Content="📥 دریافتی" Width="120" Height="32"
+                        FontFamily="B Nazanin" FontSize="14" FontWeight="Bold" BorderThickness="1" BorderBrush="#BDC3C7"
+                        Click="TabReceipt_Click" x:Name="BtnTabReceipt" Background="#ECF0F1" Foreground="#2C3E50"/>
             </StackPanel>
-        </Border>
-        <TextBlock Grid.Row="6" Text="{Binding StatusMessage}" Foreground="#7F8C8D" FontSize="{DynamicResource LabelFontSize}" Margin="0,5,0,0"/>
+        </Grid>
+        <Grid Grid.Row="1" x:Name="PanelFees">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="#2ECC71" CornerRadius="8" Padding="10" Margin="0,0,5,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="پرداخت شده" Foreground="White" FontSize="12" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding PaidAmount}" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding PaidCount, StringFormat='{}{0} مورد'}" Foreground="#D5F5E3" FontSize="11" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Background="#3498DB" CornerRadius="8" Padding="10" Margin="2,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="تایید شده" Foreground="White" FontSize="12" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding ConfirmedAmount}" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding ConfirmedCount, StringFormat='{}{0} مورد'}" Foreground="#D6EAF8" FontSize="11" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Background="#E67E22" CornerRadius="8" Padding="10" Margin="2,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="در انتظار" Foreground="White" FontSize="12" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding PendingAmount}" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding PendingCount, StringFormat='{}{0} مورد'}" Foreground="#FDEBD0" FontSize="11" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Background="#8E44AD" CornerRadius="8" Padding="10" Margin="5,0,0,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="کل" Foreground="White" FontSize="12" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding TotalAmount}" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding TotalCount, StringFormat='{}{0} مورد'}" Foreground="#EBDEF0" FontSize="11" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Border Grid.Row="1" Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,6"
+                    BorderBrush="#DEE2E6" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="150"/><ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="150"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="🔍 جستجو:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <TextBox Grid.Column="1" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center" Margin="5,0" FontSize="13" FontFamily="B Nazanin"/>
+                    <TextBlock Grid.Column="3" Text="مالک:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <ComboBox Grid.Column="4" ItemsSource="{Binding OwnerFilters}" SelectedItem="{Binding FilterOwner}" Height="28" Margin="5,0" FontSize="13" FontFamily="B Nazanin" IsEditable="True" StaysOpenOnEdit="True"/>
+                    <TextBlock Grid.Column="6" Text="شماره پرونده:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <ComboBox Grid.Column="7" ItemsSource="{Binding CaseNumberFilters}" SelectedItem="{Binding FilterCaseNumber}" Height="28" Margin="5,0" FontSize="13" FontFamily="B Nazanin" IsEditable="True" StaysOpenOnEdit="True"/>
+                    <TextBlock Grid.Column="9" Text="رشته:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <ComboBox Grid.Column="10" ItemsSource="{Binding DisciplineFilters}" SelectedItem="{Binding FilterDiscipline}" Height="28" Margin="5,0" FontSize="13" FontFamily="B Nazanin"/>
+                </Grid>
+            </Border>
+            <Border Grid.Row="2" Background="#F8F9FA" CornerRadius="8" Padding="12" Margin="0,0,0,8"
+                    BorderBrush="#DEE2E6" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="120"/><ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="10"/><ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="80"/><ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="80"/><ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="وضعیت:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding StatusFilters}" SelectedItem="{Binding FilterStatus}" Height="28" Margin="5,0" FontSize="13" FontFamily="B Nazanin"/>
+                    <TextBlock Grid.Column="3" Text="مرحله:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <ComboBox Grid.Column="4" ItemsSource="{Binding StageFilters}" SelectedItem="{Binding FilterStage}" Height="28" Margin="5,0" FontSize="13" FontFamily="B Nazanin"/>
+                    <TextBlock Grid.Column="6" Text="نوع خدمت:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <ComboBox Grid.Column="7" ItemsSource="{Binding ServiceTypeFilters}" SelectedItem="{Binding FilterServiceType}" Height="28" Margin="5,0" FontSize="13" FontFamily="B Nazanin" IsEditable="True" StaysOpenOnEdit="True"/>
+                    <TextBlock Grid.Column="9" Text="مبلغ از:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <TextBox Grid.Column="10" Text="{Binding FilterAmountFrom, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center" Margin="5,0" FontSize="13" FontFamily="B Nazanin"/>
+                    <TextBlock Grid.Column="12" Text="تا:" VerticalAlignment="Center" FontWeight="Bold" FontSize="12" FontFamily="B Nazanin"/>
+                    <TextBox Grid.Column="13" Text="{Binding FilterAmountTo, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center" Margin="5,0" FontSize="13" FontFamily="B Nazanin"/>
+                    <Button Grid.Column="15" Content="🧹 پاک کردن فیلترها" Command="{Binding ClearFiltersCommand}"
+                            Height="28" Padding="10,0" Background="#E74C3C" Foreground="White"
+                            FontSize="12" FontWeight="Bold" FontFamily="B Nazanin"
+                            Visibility="{Binding HasActiveFilters, Converter={StaticResource BoolToVisConverter}}"/>
+                    <TextBlock Grid.Column="17" Text="{Binding CountDisplay}" VerticalAlignment="Center" Foreground="#7F8C8D" FontSize="13" FontWeight="Bold" FontFamily="B Nazanin"/>
+                </Grid>
+            </Border>
+            <DataGrid Grid.Row="3" x:Name="FeesGrid" ItemsSource="{Binding Fees}" AutoGenerateColumns="False"
+                      AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
+                      CanUserSortColumns="True" FontFamily="B Nazanin" FontSize="14"
+                      PreviewMouseLeftButtonDown="FeesGrid_PreviewMouseLeftButtonDown"
+                      MouseRightButtonUp="FeesGrid_MouseRightButtonUp" FlowDirection="{DynamicResource TableFlowDirection}">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="انتخاب" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50" CanUserSort="False"/>
+                    <DataGridTextColumn Header="پرونده" Binding="{Binding CaseNumber}" SortMemberPath="CaseNumber" Width="100" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="مالک" Binding="{Binding Owner}" SortMemberPath="Owner" Width="120" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="رشته" Binding="{Binding Discipline}" SortMemberPath="Discipline" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="نوع خدمت" Binding="{Binding ServiceType}" SortMemberPath="ServiceType" Width="80" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="مرحله" Binding="{Binding Stage}" SortMemberPath="Stage" Width="60" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="مبلغ" Binding="{Binding AmountDisplay}" SortMemberPath="AmountValue" Width="130" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="وضعیت" Binding="{Binding PayStatus}" SortMemberPath="PayStatus" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="تایید" Binding="{Binding ConfirmStatus}" SortMemberPath="ConfirmStatus" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="شروع" Binding="{Binding StartDate}" SortMemberPath="StartDate" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="پایان" Binding="{Binding EndDate}" SortMemberPath="EndDate" Width="90" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="توضیحات" Binding="{Binding Description}" SortMemberPath="Description" Width="150" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Border Grid.Row="4" Background="#2C3E50" CornerRadius="6" Padding="10" Margin="0,5,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="انتخاب شده:" Foreground="#ECF0F1" FontWeight="Bold" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="{Binding SelectedCount}" Foreground="#2ECC71" FontWeight="Bold" Margin="0,0,5,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="مورد | جمع:" Foreground="#ECF0F1" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="{Binding SelectedAmount}" Foreground="#F1C40F" FontWeight="Bold" FontSize="14" FontFamily="B Nazanin"/>
+                </StackPanel>
+            </Border>
+            <TextBlock Grid.Row="5" Text="{Binding StatusMessage}" Foreground="#7F8C8D" FontSize="12" Margin="0,5,0,0" FontFamily="B Nazanin"/>
+        </Grid>
+        <Grid Grid.Row="1" x:Name="PanelReceipts" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="White" CornerRadius="8" Padding="10" Margin="0,0,0,10" BorderBrush="#BDC3C7" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="➕ افزودن" Command="{Binding AddReceiptCommand}" Height="32" Padding="12,0" Background="#27AE60" Foreground="White" FontWeight="Bold" FontFamily="B Nazanin" FontSize="14" Margin="0,0,6,0"/>
+                    <Button Grid.Column="1" Content="✏️ ویرایش" Height="32" Padding="12,0" Background="#3498DB" Foreground="White" FontWeight="Bold" FontFamily="B Nazanin" FontSize="14" Margin="0,0,6,0" Click="ReceiptEdit_Click"/>
+                    <Button Grid.Column="2" Content="🗑 حذف" Height="32" Padding="12,0" Background="#E74C3C" Foreground="White" FontWeight="Bold" FontFamily="B Nazanin" FontSize="14" Margin="0,0,6,0" Click="ReceiptDelete_Click"/>
+                    <Button Grid.Column="3" Content="🔄 بروزرسانی" Command="{Binding UpdateReceiptsCommand}" Height="32" Padding="12,0" Background="#F39C12" Foreground="White" FontWeight="Bold" FontFamily="B Nazanin" FontSize="14" Margin="0,0,6,0" ToolTip="حق‌الزحمه‌های تغییرکرده را محاسبه و ردیف‌های متاثر را سبز می‌کند"/>
+                    <Button Grid.Column="4" Content="📤 خروجی اکسل" Command="{Binding ExportReceiptsCommand}" Height="32" Padding="12,0" Background="#1B3147" Foreground="White" FontFamily="B Nazanin" FontSize="14" Margin="0,0,6,0"/>
+                    <Button Grid.Column="5" Content="📥 ورودی اکسل" Command="{Binding ImportReceiptsCommand}" Height="32" Padding="12,0" Background="#7D3C98" Foreground="White" FontFamily="B Nazanin" FontSize="14" Margin="0,0,6,0"/>
+                    <Button Grid.Column="6" Content="🔄 بارگذاری" Command="{Binding RefreshReceiptsCommand}" Height="32" Padding="12,0" Background="#95A5A6" Foreground="White" FontFamily="B Nazanin" FontSize="14"/>
+                    <StackPanel Grid.Column="7" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <TextBlock Text="🔍 جستجو:" VerticalAlignment="Center" FontWeight="Bold" FontFamily="B Nazanin" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBox Text="{Binding ReceiptSearch, UpdateSourceTrigger=PropertyChanged}" Width="180" Height="28" VerticalContentAlignment="Center" Padding="6,0" FontFamily="B Nazanin" FontSize="14"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="8" Text="{Binding ReceiptStatus}" VerticalAlignment="Center" Foreground="#7F8C8D" FontWeight="Bold" FontFamily="B Nazanin" FontSize="13" Margin="10,0,0,0"/>
+                </Grid>
+            </Border>
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="#1B3147" CornerRadius="8" Padding="12" Margin="0,0,5,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="جمع واریزی" Foreground="White" FontSize="12" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding ReceiptTotalAmount}" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Background="#2E86C1" CornerRadius="8" Padding="12" Margin="5,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="جمع حق‌الزحمه مرتبط" Foreground="White" FontSize="12" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding ReceiptTotalFeeSum}" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Background="#117A65" CornerRadius="8" Padding="12" Margin="5,0,0,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="جمع اختلاف" Foreground="White" FontSize="12" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                        <TextBlock Text="{Binding ReceiptTotalDiff}" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" FontFamily="B Nazanin"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <DataGrid Grid.Row="2" x:Name="ReceiptsGrid" ItemsSource="{Binding Receipts}" AutoGenerateColumns="False"
+                      IsReadOnly="False" SelectionMode="Single" SelectionUnit="FullRow"
+                      AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
+                      CanUserSortColumns="True" FontFamily="B Nazanin" FontSize="14"
+                      PreviewMouseLeftButtonDown="ReceiptsGrid_PreviewMouseLeftButtonDown"
+                      MouseDoubleClick="ReceiptsGrid_DoubleClick"
+                      FlowDirection="{DynamicResource TableFlowDirection}">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRecentlyUpdated}" Value="True">
+                                <Setter Property="Background" Value="#D5F5E3"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="انتخاب" Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="50" CanUserSort="False"/>
+                    <DataGridTextColumn Header="نوع" Binding="{Binding TypeDisplay}" SortMemberPath="IsAdvance" Width="85" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="B Nazanin"/>
+                                <Setter Property="Background" Value="#F8F9FA"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAdvance}" Value="True">
+                                        <Setter Property="Background" Value="#FEF9E7"/>
+                                        <Setter Property="Foreground" Value="#7D6608"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="تاریخ واریز" Binding="{Binding ReceiptDate}" SortMemberPath="ReceiptDate" Width="110" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="مبلغ واریز" Binding="{Binding AmountDisplay}" SortMemberPath="Amount" Width="130" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="تاریخ‌های مرتبط (آغاز)" Binding="{Binding RelatedDisplay}" SortMemberPath="RelatedDisplay" Width="240" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="جمع حق‌الزحمه" Binding="{Binding FeeSumDisplay}" SortMemberPath="FeeSum" Width="130" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="اختلاف" Binding="{Binding DifferenceDisplay}" SortMemberPath="Difference" Width="130" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="B Nazanin"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsNegative}" Value="True">
+                                        <Setter Property="Foreground" Value="#C0392B"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="تغییرات" Binding="{Binding Changes}" SortMemberPath="Changes" Width="220" IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Border Grid.Row="3" Background="#2C3E50" CornerRadius="6" Padding="10" Margin="0,5,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="انتخاب شده:" Foreground="#ECF0F1" FontWeight="Bold" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="{Binding ReceiptSelectedCount}" Foreground="#2ECC71" FontWeight="Bold" Margin="0,0,5,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="مورد | جمع واریز:" Foreground="#ECF0F1" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="{Binding ReceiptSelectedAmount}" Foreground="#F1C40F" FontWeight="Bold" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="جمع حق‌الزحمه:" Foreground="#ECF0F1" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="{Binding ReceiptSelectedFeeSum}" Foreground="#85C1E9" FontWeight="Bold" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="اختلاف:" Foreground="#ECF0F1" Margin="0,0,10,0" FontFamily="B Nazanin" FontSize="14"/>
+                    <TextBlock Text="{Binding ReceiptSelectedDiff}" Foreground="#F1948A" FontWeight="Bold" FontFamily="B Nazanin" FontSize="14"/>
+                </StackPanel>
+            </Border>
+            <TextBlock Grid.Row="4" Text="💡 نکته: ردیف سبز = بعد از آخرین بروزرسانی تغییر کرده | اختلاف منفی = قرمز | کلیک روی هر ردیف = انتخاب | دابل‌کلیک = ویرایش" Foreground="#7F8C8D" FontSize="12" Margin="0,6,0,0" FontFamily="B Nazanin"/>
+            <TextBlock Grid.Row="5" Text="{Binding ReceiptStatus}" Foreground="#27AE60" FontWeight="Bold" FontSize="13" Margin="0,4,0,0" FontFamily="B Nazanin"/>
+        </Grid>
     </Grid>
 </UserControl>

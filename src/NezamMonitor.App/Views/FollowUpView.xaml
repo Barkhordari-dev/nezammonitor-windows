@@ -29,6 +29,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Text="🔍 جستجو:" VerticalAlignment="Center" FontWeight="Bold" FontSize="{DynamicResource LabelFontSize}" Margin="0,0,5,0"/>
@@ -43,7 +44,10 @@
                         Height="28" Background="#27AE60" Foreground="White" FontSize="{DynamicResource ButtonFontSize}" Margin="0,0,5,0"/>
                 <Button Grid.Column="5" Content="🔄 بروزرسانی" Command="{Binding RefreshCommand}"
                         Height="28" Background="#3498DB" Foreground="White" FontSize="{DynamicResource ButtonFontSize}" Margin="0,0,5,0"/>
-                <Button Grid.Column="6" Content="📁 دسته‌بندی بر اساس محدوده"
+                <Button Grid.Column="6" Content="📱 خروجی مخاطبین"
+                        Click="ExportVCard_Click"
+                        Height="28" Background="#3498DB" Foreground="White" FontSize="{DynamicResource ButtonFontSize}" Margin="0,0,5,0"/>
+                <Button Grid.Column="7" Content="📁 دسته‌بندی بر اساس محدوده"
                         Command="{Binding GroupByRangeCommand}"
                         Height="28" Background="#9B59B6" Foreground="White" FontSize="{DynamicResource ButtonFontSize}"/>
             </Grid>
@@ -52,9 +56,9 @@
         <!-- جدول داده -->
         <DataGrid x:Name="FollowUpGrid" Grid.Row="2" ItemsSource="{Binding Items}" AutoGenerateColumns="False" IsReadOnly="False"
                   CanUserAddRows="False" CanUserDeleteRows="False"
+                  SelectionMode="Extended" SelectionUnit="FullRow"
                   AlternatingRowBackground="#F8F9FA" GridLinesVisibility="Horizontal"
                   HeadersVisibility="Column" BorderThickness="1" BorderBrush="#DEE2E6"
-                  SelectionUnit="Cell" SelectionMode="Extended"
                   MouseRightButtonUp="FollowUpGrid_MouseRightButtonUp"
                   CellEditEnding="FollowUpGrid_CellEditEnding" FlowDirection="{DynamicResource TableFlowDirection}">
             <DataGrid.Columns>

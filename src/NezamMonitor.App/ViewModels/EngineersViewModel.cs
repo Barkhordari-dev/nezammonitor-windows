@@ -44,6 +44,8 @@ public sealed class EngineersViewModel : ViewModelBase
     public ICommand RefreshCommand { get; }
     public ICommand ClearFiltersCommand { get; }
     public ICommand FilterByValueCommand { get; }
+    public ICommand ImportFromExcelCommand { get; }
+    public ICommand ExportVCardCommand { get; }
 
     private List<EngineerItem> _all = new();
 
@@ -53,6 +55,8 @@ public sealed class EngineersViewModel : ViewModelBase
         RefreshCommand = new RelayCommand(Load);
         ClearFiltersCommand = new RelayCommand(ClearFilters);
         FilterByValueCommand = new RelayCommand<string>(FilterByValue);
+        ImportFromExcelCommand = new RelayCommand(ImportFromExcel);
+        ExportVCardCommand = new RelayCommand(ExportVCard);
         Load();
     }
 
@@ -65,7 +69,18 @@ public sealed class EngineersViewModel : ViewModelBase
         _all.Clear();
         foreach (var c in cases)
             foreach (var e in c.Engineers)
-                _all.Add(new EngineerItem { CaseNumber = c.CaseNumber, Owner = c.Owner, Serial = c.Serial, Discipline = e.Discipline, Name = e.Name });
+                _all.Add(new EngineerItem
+                {
+                    CaseNumber = c.CaseNumber,
+                    Owner = c.Owner,
+                    Serial = c.Serial,
+                    Discipline = e.Discipline,
+                    Name = e.Name,
+                    Phone = e.Phone,
+                    DesignLevel = e.DesignLevel,
+                    SupervisionLevel = e.SupervisionLevel,
+                    ExecutionLevel = e.ExecutionLevel
+                });
 
         // Build dynamic filter lists from actual data
         DisciplineFilters = FilterHelper.ExtractDistinctValues(_all, e => e.Discipline);
@@ -114,6 +129,104 @@ public sealed class EngineersViewModel : ViewModelBase
         FilterEngineer = "همه";
     }
 
+    private void ImportFromExcel()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "فایل اکسل|*.xlsx;*.xls",
+            Title = "انتخاب فایل اطلاعات مهندسین"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        try
+        {
+            StatusMessage = "در حال خواندن فایل اکسل...";
+            
+            // خواندن فایل اکسل با ClosedXML
+            using var workbook = new ClosedXML.Excel.XLWorkbook(dialog.FileName);
+            var worksheet = workbook.Worksheet(1); // شیت اول
+            
+            // بررسی خالی نبودن شیت
+            var usedRange = worksheet.RangeUsed();
+            if (usedRange == null)
+            {
+                StatusMessage = "❌ فایل اکسل خالی است";
+                return;
+            }
+            
+            // خواندن همه ردیف‌ها در حافظه
+            var records = new List<(string FirstName, string LastName, string FullName, string Phone, string Discipline, string DesignLevel, string SupervisionLevel, string ExecutionLevel)>();
+            foreach (var row in usedRange.RowsUsed().Skip(1))
+            {
+                var firstName = row.Cell(2).GetString().Trim();
+                var lastName = row.Cell(3).GetString().Trim();
+                var phone = row.Cell(4).GetString().Trim();
+                var discipline = row.Cell(5).GetString().Trim();
+                var designLevel = row.Cell(6).GetString().Trim();
+                var supervisionLevel = row.Cell(7).GetString().Trim();
+                var executionLevel = row.Cell(8).GetString().Trim();
+                
+                var fullName = $"{firstName} {lastName}".Trim();
+                if (string.IsNullOrEmpty(fullName)) continue;
+                
+                records.Add((firstName, lastName, fullName, phone, discipline, designLevel, supervisionLevel, executionLevel));
+            }
+            
+            StatusMessage = $"در حال ذخیره {records.Count} رکورد...";
+            
+            // پاک کردن و درج دسته‌ای (خیلی سریع)
+            _db.ClearEngineerRegistry();
+            _db.BulkInsertEngineerRegistry(records);
+            
+            // تطبیق مهندسین
+            int matched = _db.MatchEngineersFromRegistry();
+            
+            StatusMessage = $"✅ {records.Count} مهندس از اکسل خوانده شد | {matched} مهندس با دیتابیس تطبیق یافت";
+            
+            // بارگذاری مجدد
+            Load();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"❌ خطا: {ex.Message}";
+        }
+    }
+
+    private void ExportVCard()
+    {
+        try
+        {
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = "ذخیره فایل مخاطبین مهندسین",
+                Filter = "فایل vCard|*.vcf",
+                DefaultExt = ".vcf",
+                FileName = $"engineers_contacts_{DateTime.Now:yyyyMMdd}.vcf"
+            };
+
+            if (dialog.ShowDialog() != true) return;
+
+            StatusMessage = "در حال ایجاد فایل مخاطبین...";
+
+            var exporter = new NezamMonitor.Core.Export.VCardExporter(_db);
+            var result = exporter.Export(dialog.FileName);
+
+            if (result.Success)
+            {
+                StatusMessage = $"✅ {result.EngineerCount} مهندس — فایل ذخیره شد: {result.OutputPath}";
+            }
+            else
+            {
+                StatusMessage = "❌ " + string.Join(" | ", result.Errors);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"❌ خطا: {ex.Message}";
+        }
+    }
+
     /// <summary>
     /// Filter by a specific cell value. The parameter format is "Column:Value".
     /// </summary>
@@ -156,4 +269,8 @@ public sealed class EngineerItem
     public string Serial { get; set; } = "";
     public string Discipline { get; set; } = "";
     public string Name { get; set; } = "";
+    public string Phone { get; set; } = "";
+    public string DesignLevel { get; set; } = "";
+    public string SupervisionLevel { get; set; } = "";
+    public string ExecutionLevel { get; set; } = "";
 }

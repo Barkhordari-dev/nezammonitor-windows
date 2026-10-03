@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Input;
 using NezamMonitor.Core.Data;
 using NezamMonitor.Core.Models;
@@ -49,17 +51,46 @@ public sealed class ReportsViewModel : ViewModelBase
     public ICommand RefreshCommand { get; }
     public ICommand ClearFiltersCommand { get; }
     public ICommand FilterByValueCommand { get; }
+    public ICommand OpenFolderCommand { get; }
 
     private List<ReportItem> _all = new();
 
+    private string _outputPath = "";
+
+    private static string ResolveOutputPath()
+        {
+            var exeDir = System.AppDomain.CurrentDomain.BaseDirectory;
+            var primary = System.IO.Path.Combine(exeDir, "outputs");
+            if (System.IO.Directory.Exists(primary)) return primary;
+            // Dev fallback: walk up and look for <repo>/outputs (where real data lives)
+            var dir = new System.IO.DirectoryInfo(exeDir);
+            for (int i = 0; i < 6 && dir != null; i++)
+            {
+                var candidate = System.IO.Path.Combine(dir.FullName, "outputs");
+                if (System.IO.Directory.Exists(candidate)) return candidate;
+                dir = dir.Parent;
+            }
+            // Same for nezam_output legacy folder
+            dir = new System.IO.DirectoryInfo(exeDir);
+            for (int i = 0; i < 6 && dir != null; i++)
+            {
+                var candidate = System.IO.Path.Combine(dir.FullName, "nezam_output");
+                if (System.IO.Directory.Exists(candidate)) return candidate;
+                dir = dir.Parent;
+            }
+            return primary;
+        }
+
     public ReportsViewModel(NezamDatabase db)
-    {
-        _db = db;
-        RefreshCommand = new RelayCommand(Load);
-        ClearFiltersCommand = new RelayCommand(ClearFilters);
-        FilterByValueCommand = new RelayCommand<string>(FilterByValue);
-        Load();
-    }
+        {
+            _db = db;
+            _outputPath = ResolveOutputPath();
+            RefreshCommand = new RelayCommand(Load);
+            ClearFiltersCommand = new RelayCommand(ClearFilters);
+            FilterByValueCommand = new RelayCommand<string>(FilterByValue);
+            OpenFolderCommand = new RelayCommand<ReportItem>(OpenFolder);
+            Load();
+        }
 
     private void Load()
     {
@@ -137,18 +168,55 @@ public sealed class ReportsViewModel : ViewModelBase
     }
 
     public void RemoveFilter(string column)
-    {
-        switch (column)
         {
-            case "ReportType": FilterReportType = "همه"; break;
-            case "Stage": FilterStage = "همه"; break;
-            case "Owner": FilterOwner = "همه"; break;
-            case "CaseNumber": FilterCaseNumber = "همه"; break;
-            case "Engineer": FilterEngineer = "همه"; break;
-            case "Discipline": FilterDiscipline = "همه"; break;
+            switch (column)
+            {
+                case "ReportType": FilterReportType = "همه"; break;
+                case "Stage": FilterStage = "همه"; break;
+                case "Owner": FilterOwner = "همه"; break;
+                case "CaseNumber": FilterCaseNumber = "همه"; break;
+                case "Engineer": FilterEngineer = "همه"; break;
+                case "Discipline": FilterDiscipline = "همه"; break;
+            }
+        }
+
+        private void OpenFolder(ReportItem? item)
+        {
+            if (item == null)
+            {
+                StatusMessage = "موردی انتخاب نشده";
+                return;
+            }
+
+            if (string.IsNullOrEmpty(item.CaseNumber))
+            {
+                StatusMessage = "شماره پرونده نامعتبر";
+                return;
+            }
+
+            var caseParts = item.CaseNumber.Split('/');
+            var searchPattern = caseParts.Length == 2 ? $"{caseParts[1]}-{caseParts[0]}" : item.CaseNumber;
+
+            if (!Directory.Exists(_outputPath))
+            {
+                StatusMessage = "پوشه خروجی یافت نشد";
+                return;
+            }
+
+            foreach (var dir in Directory.GetDirectories(_outputPath))
+            {
+                var dirName = System.IO.Path.GetFileName(dir);
+                if (dirName.Contains(searchPattern))
+                {
+                    Process.Start(new ProcessStartInfo { FileName = dir, UseShellExecute = true });
+                    StatusMessage = $"باز شد: {dir}";
+                    return;
+                }
+            }
+
+            StatusMessage = $"پوشه‌ای برای پرونده {item.CaseNumber} یافت نشد";
         }
     }
-}
 
 public sealed class ReportItem
 {

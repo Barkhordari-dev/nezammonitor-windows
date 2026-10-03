@@ -1,0 +1,80 @@
+# Binaries & build outputs
+**/bin/
+**/obj/
+publish/
+publish_release/
+release_stage/
+runtimes/
+x64/
+x86/
+
+# Database - فقط فایل دیتابیس و پوشه دیتای اجرایی (نه پوشه سورس NezamMonitor.Core/Data)
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+*.nzmdata
+/data/
+**/data/*.db
+**/data/*.sqlite
+
+# Sensitive / personal artefacts (فقط فایل‌های ریشه)
+*.vcf
+/*.xlsx
+/*.xls
+SinaYazd*.xlsx
+*_contacts*.vcf
+owners_*.vcf
+engineers_*.vcf
+
+# اجازه انتشار قالب‌ها
+!templates/
+!templates/*.docx
+!**/templates/*.docx
+*.bak
+
+# Secrets
+appsettings.*.json
+secrets.json
+.env
+*.pfx
+*.key
+
+# Dev scripts (موقتی)
+diag_*.bat
+diag_*.ps1
+diagnose*.ps1
+diagnose_*.ps1
+run_diag.bat
+fix*.py
+write_*.py
+
+# VS / IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
+*.log
+*.tmp
+.DS_Store
+
+# NuGet
+*.nupkg
+packages/
+
+# Outputs (خروجی‌های کاربر)
+outputs/
+nezam_output/
+outputs_*/
+
+# Test results
+TestResults/
+coverage*/

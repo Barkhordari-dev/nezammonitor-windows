@@ -14,6 +14,14 @@
             <local:TabToVisibilityConverter x:Key="TabToVisConverter"/>
             <local:TabBgConverter x:Key="TabBgConverter"/>
             <local:TabFgConverter x:Key="TabFgConverter"/>
+            <local:ReportCountConverter x:Key="ReportCountConverter"/>
+            <!-- Dashboard converters -->
+            <local:LevelToBrushConverter x:Key="LevelToBrushConverter"/>
+            <local:LevelToBgBrushConverter x:Key="LevelToBgBrushConverter"/>
+            <local:ZeroToGrayConverter x:Key="ZeroToGrayConverter"/>
+            <local:ZeroToVisibleConverter x:Key="ZeroToVisibleConverter"/>
+            <local:CountToBadgeVisibilityConverter x:Key="OverdueBadgeVis"/>
+            <local:CountToBadgeVisibilityConverter x:Key="UpcomingBadgeVis"/>
             
             <!-- Default Font Sizes (will be overridden by ThemeManager) -->
             <sys:Double x:Key="FontSize">14</sys:Double>
@@ -28,9 +36,36 @@
             
             <!-- Persian RTL Typography -->
             <Style TargetType="Window">
-                <Setter Property="FlowDirection" Value="RightToLeft"/>
+                <Setter Property="FlowDirection" Value="{DynamicResource MainWindowFlowDirection}"/>
                 <Setter Property="FontFamily" Value="{DynamicResource FontFamily}"/>
                 <Setter Property="FontSize" Value="{DynamicResource FontSize}"/>
+            </Style>
+
+            <!-- Frame, Page, UserControl -->
+            <Style TargetType="{x:Type Frame}">
+                <Setter Property="FlowDirection" Value="{DynamicResource MainWindowFlowDirection}"/>
+            </Style>
+            <Style TargetType="{x:Type Page}">
+                <Setter Property="FlowDirection" Value="{DynamicResource MainWindowFlowDirection}"/>
+            </Style>
+            <Style TargetType="{x:Type UserControl}">
+                <Setter Property="FlowDirection" Value="{DynamicResource MainWindowFlowDirection}"/>
+            </Style>
+
+            <!-- Table Controls -->
+            <Style TargetType="{x:Type DataGrid}">
+                <Setter Property="FlowDirection" Value="{DynamicResource TableFlowDirection}"/>
+            </Style>
+
+            <!-- Menu Controls -->
+            <Style TargetType="{x:Type Menu}">
+                <Setter Property="FlowDirection" Value="{DynamicResource MenuFlowDirection}"/>
+            </Style>
+            <Style TargetType="{x:Type ContextMenu}">
+                <Setter Property="FlowDirection" Value="{DynamicResource MenuFlowDirection}"/>
+            </Style>
+            <Style TargetType="{x:Type MenuItem}">
+                <Setter Property="FlowDirection" Value="{DynamicResource MenuFlowDirection}"/>
             </Style>
 
             <!-- Navigation Button Style -->

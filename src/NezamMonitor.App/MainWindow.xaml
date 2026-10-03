@@ -4,7 +4,7 @@
         Title="سیستم مانیتور نظم مهندسی یزد"
         Width="1200" Height="750"
         MinWidth="800" MinHeight="500"
-        FlowDirection="RightToLeft"
+        FlowDirection="{DynamicResource MainWindowFlowDirection}"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}"
         FontFamily="{DynamicResource FontFamily}"
@@ -73,7 +73,8 @@
         </Border>
 
         <!-- Content Area -->
-        <Frame x:Name="MainFrame" Grid.Row="1" Grid.Column="1" NavigationUIVisibility="Hidden" Background="Transparent"/>
+        <Frame x:Name="MainFrame" Grid.Row="1" Grid.Column="1" NavigationUIVisibility="Hidden" Background="Transparent"
+               FlowDirection="{DynamicResource MainWindowFlowDirection}"/>
 
         <!-- Status Bar -->
         <Border Grid.Row="2" Grid.ColumnSpan="2" Background="{DynamicResource PrimaryBrush}" Padding="10,3">

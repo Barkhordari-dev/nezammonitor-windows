@@ -65,7 +65,7 @@ public sealed class AndroidExportEngine
                 Checksum = ComputeChecksum(dataJson),
                 ExportedEntities = new List<string>
                 {
-                    "cases", "specifications", "engineers", "fees", "reports", "followUpEdits"
+                    "cases", "specifications", "engineers", "fees", "reports", "followUpEdits", "feeReceipts"
                 }
             };
 
@@ -138,7 +138,13 @@ public sealed class AndroidExportEngine
                 Office = c.Office,
                 ReportDate1 = c.ReportDate1,
                 ReportDate2 = c.ReportDate2,
-                ReportDate3 = c.ReportDate3
+                ReportDate3 = c.ReportDate3,
+                OwnerFather = c.OwnerFather,
+                OwnerNationalCode = c.OwnerNationalCode,
+                OwnerAddress = c.OwnerAddress,
+                OwnerZip = c.OwnerZip,
+                OwnerTel = c.OwnerTel,
+                OwnerBirthLoc = c.OwnerBirthLoc
             };
 
             // Specification
@@ -169,12 +175,16 @@ public sealed class AndroidExportEngine
                 };
             }
 
-            // Engineers
+            // Engineers (v2: phone + levels)
             exportCase.Engineers = c.Engineers.Select(e => new ExportEngineer
             {
                 Discipline = e.Discipline,
                 Name = e.Name,
-                Role = e.Role
+                Role = e.Role,
+                Phone = e.Phone,
+                DesignLevel = e.DesignLevel,
+                SupervisionLevel = e.SupervisionLevel,
+                ExecutionLevel = e.ExecutionLevel
             }).ToList();
 
             // Fees
@@ -221,6 +231,25 @@ public sealed class AndroidExportEngine
 
             data.Cases.Add(exportCase);
         }
+
+        // FeeReceipts (v2)
+        try
+        {
+            var receipts = _db.GetFeeReceipts();
+            data.FeeReceipts = receipts.Select(r => new ExportFeeReceipt
+            {
+                ReceiptDate = r.ReceiptDate,
+                Amount = r.Amount,
+                RelatedEndDatesRaw = r.RelatedEndDatesRaw,
+                IsAdvance = r.IsAdvance,
+                FeeSum = r.FeeSum,
+                Changes = r.Changes,
+                IsRecentlyUpdated = r.IsRecentlyUpdated,
+                CreatedAt = r.CreatedAt,
+                UpdatedAt = r.UpdatedAt
+            }).ToList();
+        }
+        catch { /* FeeReceipts table may not exist on old DB */ }
 
         return data;
     }
@@ -283,6 +312,7 @@ public class ExportMetadata
 public class ExportData
 {
     public List<ExportCase> Cases { get; set; } = new();
+    public List<ExportFeeReceipt> FeeReceipts { get; set; } = new();
 }
 
 public class ExportCase
@@ -297,6 +327,12 @@ public class ExportCase
     public string ReportDate1 { get; set; } = "";
     public string ReportDate2 { get; set; } = "";
     public string ReportDate3 { get; set; } = "";
+    public string OwnerFather { get; set; } = "";
+    public string OwnerNationalCode { get; set; } = "";
+    public string OwnerAddress { get; set; } = "";
+    public string OwnerZip { get; set; } = "";
+    public string OwnerTel { get; set; } = "";
+    public string OwnerBirthLoc { get; set; } = "";
     public ExportSpecification? Specification { get; set; }
     public List<ExportEngineer> Engineers { get; set; } = new();
     public List<ExportFee> Fees { get; set; } = new();
@@ -333,6 +369,23 @@ public class ExportEngineer
     public string Discipline { get; set; } = "";
     public string Name { get; set; } = "";
     public string Role { get; set; } = "";
+    public string Phone { get; set; } = "";
+    public string DesignLevel { get; set; } = "";
+    public string SupervisionLevel { get; set; } = "";
+    public string ExecutionLevel { get; set; } = "";
+}
+
+public class ExportFeeReceipt
+{
+    public string ReceiptDate { get; set; } = "";
+    public long Amount { get; set; }
+    public string RelatedEndDatesRaw { get; set; } = "";
+    public bool IsAdvance { get; set; }
+    public long FeeSum { get; set; }
+    public string Changes { get; set; } = "";
+    public bool IsRecentlyUpdated { get; set; }
+    public string CreatedAt { get; set; } = "";
+    public string UpdatedAt { get; set; } = "";
 }
 
 public class ExportFee

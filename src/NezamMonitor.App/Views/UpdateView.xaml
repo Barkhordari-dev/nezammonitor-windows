@@ -1,4 +1,4 @@
-<UserControl x:Class="NezamMonitor.App.Views.UpdateView"
+<UserControl x:Class="NezamMonitor.App.Views.UpdateView" FlowDirection="{DynamicResource MainWindowFlowDirection}"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:srv="clr-namespace:NezamMonitor.App.Services">
@@ -56,7 +56,7 @@
                               IsChecked="{Binding FilterIncompleteOnly, Source={x:Static srv:ExtractionController.Instance}}"
                               Margin="0,8,0,5" FontSize="{DynamicResource FontSize}"/>
                     <StackPanel Orientation="Horizontal" Margin="10,0,0,0"
-                                Visibility="{Binding ExtractSpecifications, Converter={StaticResource BoolToVisConverter}}">
+                                Visibility="{Binding ExtractSpecifications, Converter={StaticResource BoolToVisConverter}, Source={x:Static srv:ExtractionController.Instance}}">
                         <TextBlock Text="حالت:" VerticalAlignment="Center" Width="50" FontWeight="Bold"/>
                         <RadioButton Content="فقط ناقص" IsChecked="{Binding UpdateAllSpecifications, Converter={StaticResource InverseBoolConverter}, Source={x:Static srv:ExtractionController.Instance}}"
                                      Margin="0,0,20,0" VerticalAlignment="Center" GroupName="SpecMode"/>
@@ -73,10 +73,13 @@
                     <TextBlock Text="📁 گزینه‌های فایل" FontSize="{DynamicResource FontSize}" FontWeight="Bold" Margin="0,0,0,10"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                         <TextBlock Text="مسیر ذخیره فایل‌ها:" VerticalAlignment="Center" Width="120"/>
-                        <TextBox Text="{Binding OutputPath, UpdateSourceTrigger=PropertyChanged}" Width="400" Height="28" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Text="{Binding OutputPath, UpdateSourceTrigger=PropertyChanged, Source={x:Static srv:ExtractionController.Instance}}" Width="400" Height="28" VerticalContentAlignment="Center" Margin="0,0,10,0"/>
                         <Button Content="📁 انتخاب" Width="80" Height="28" Click="BtnBrowseOutput_Click"/>
                     </StackPanel>
-                    <CheckBox Content="📥 دانلود فایل‌های گزارش (تصاویر/PDF)" IsChecked="{Binding ExtractReportFiles}" Margin="0,0,0,5" FontSize="{DynamicResource FontSize}"/>
+                    <CheckBox Content="📥 دانلود فایل‌های گزارش (تصاویر/PDF)" IsChecked="{Binding ExtractReportFiles, Source={x:Static srv:ExtractionController.Instance}}" Margin="0,0,0,5" FontSize="{DynamicResource FontSize}"/>
+                    <CheckBox Content="⏭ رد فایل‌های موجود با حجم یکسان (سریع‌تر)"
+                              IsChecked="{Binding SkipExistingReportFiles, Source={x:Static srv:ExtractionController.Instance}}"
+                              Margin="25,0,0,0" FontSize="{DynamicResource LabelFontSize}" Foreground="Gray"/>
                 </StackPanel>
             </Border>
 

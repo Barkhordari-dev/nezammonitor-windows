@@ -158,3 +158,72 @@ public sealed class ReportCountConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+// ═══════════════════════════════════════════════════════
+// Dashboard Converters
+// ═══════════════════════════════════════════════════════
+
+/// <summary>Converts status level string to brush for left-side indicator bar.</summary>
+public sealed class LevelToBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value?.ToString() switch
+        {
+            "critical" => "#E74C3C",
+            "warning" => "#E67E22",
+            "urgent" => "#F39C12",
+            "normal" => "#3498DB",
+            _ => "#BDC3C7"
+        };
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
+/// <summary>Converts status level string to background brush for status badge.</summary>
+public sealed class LevelToBgBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value?.ToString() switch
+        {
+            "urgent" => "#E74C3C",
+            "normal" => "#3498DB",
+            _ => "#3498DB"
+        };
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
+/// <summary>Converts int: 0 → Gray, else → default (Black).</summary>
+public sealed class ZeroToGrayConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int i && i == 0) return "#27AE60";
+        return "#E74C3C";
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
+/// <summary>Converts int: 0 → Collapsed, else → Visible.</summary>
+public sealed class ZeroToVisibleConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int i && i == 0) return Visibility.Collapsed;
+        return Visibility.Visible;
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
+/// <summary>Converts int: >0 → Visible (badge), 0 → Collapsed.</summary>
+public sealed class CountToBadgeVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int i && i > 0) return Visibility.Visible;
+        return Visibility.Collapsed;
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+}

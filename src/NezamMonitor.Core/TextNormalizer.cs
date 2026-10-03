@@ -20,6 +20,6 @@ public static class TextNormalizer
     public static string ReverseDate(string date)
     {
         var parts = DigitNormalizer.ToAsciiDigits(date ?? "").Split('/');
-        return parts.Length == 3 ? $"{parts[2].Trim()}/{parts[1].Trim()}/{parts[0].Trim()}" : date;
+        return parts.Length == 3 ? $"{parts[2].Trim()}/{parts[1].Trim()}/{parts[0].Trim()}" : date ?? "";
     }
 }

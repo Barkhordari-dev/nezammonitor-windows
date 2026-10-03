@@ -26,9 +26,20 @@ jobs:
     - name: Build
       run: dotnet build src/NezamMonitor.sln -c Release --no-restore
     
-    - name: Publish
-      run: dotnet publish src/NezamMonitor.App/NezamMonitor.App.csproj -c Release -o publish/
-    
+    - name: Publish (self-contained single-file — نیاز به نصب .NET ندارد)
+      run: dotnet publish src/NezamMonitor.App/NezamMonitor.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -p:DebugSymbols=false -o publish/
+
+    - name: Prepare release package (only runtime files)
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: pwsh
+      run: |
+        # فقط فایل‌های لازم برای اجرا — templates کنار exe
+        if (Test-Path "src/templates") { Copy-Item "src/templates" "publish/templates" -Recurse -Force }
+        elseif (Test-Path "release/templates") { Copy-Item "release/templates" "publish/templates" -Recurse -Force }
+        Get-ChildItem publish | Format-Table Name, Length
+        $exe = Get-ChildItem publish/*.exe | Select-Object -First 1
+        Write-Host "EXE size MB: $([math]::Round($exe.Length/1MB,1))"
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
@@ -39,6 +50,9 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v2
       with:
-        files: publish/*.exe
+        files: |
+          publish/*.exe
+          publish/templates/*.docx
         draft: false
         prerelease: false
+        generate_release_notes: true

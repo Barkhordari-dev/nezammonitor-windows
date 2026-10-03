@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using NezamMonitor.App.Services;
 using NezamMonitor.App.ViewModels;
 
@@ -14,13 +15,25 @@ public partial class GeneratorView : UserControl
         DataContext = new GeneratorViewModel(DatabaseService.Instance);
     }
 
-    private void StageRadio_Checked(object sender, RoutedEventArgs e)
+    private void StageFilter_Changed(object sender, SelectionChangedEventArgs e)
     {
-        if (sender is RadioButton rb && rb.Tag is string tag && int.TryParse(tag, out int stage))
+        if (sender is ComboBox cb && cb.SelectedItem is ComboBoxItem item && item.Tag is string tag && int.TryParse(tag, out int stage))
         {
             if (DataContext is GeneratorViewModel vm)
                 vm.SelectedStage = stage;
         }
+    }
+
+    private void FilterStage_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox cb && DataContext is GeneratorViewModel vm)
+            vm.FilterStage = cb.SelectedIndex;
+    }
+
+    private void FilterStatus_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox cb && DataContext is GeneratorViewModel vm)
+            vm.FilterStatus = cb.SelectedIndex;
     }
 
     private void CaseGrid_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -92,70 +105,115 @@ public partial class GeneratorView : UserControl
 
     private void HistoryGrid_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (sender is DataGrid dg && dg.SelectedItem is ReportHistoryItem item)
+        if (sender is DataGrid dg)
         {
-            var menu = new ContextMenu();
-
-            // باز کردن گزارش
-            var openReport = new MenuItem { Header = "📄 باز کردن گزارش", Tag = item };
-            openReport.Click += (s, args) =>
+            // انتخاب ردیف راست‌کلیک‌شده اگه قبلاً انتخاب نشده
+            var hit = dg.InputHitTest(e.GetPosition(dg));
+            if (hit is DependencyObject depObj)
             {
-                if (DataContext is GeneratorViewModel vm)
-                    vm.OpenReport(item);
-            };
-            menu.Items.Add(openReport);
-
-            // باز کردن پوشه
-            var openFolder = new MenuItem { Header = "📂 باز کردن پوشه", Tag = item };
-            openFolder.Click += (s, args) =>
-            {
-                if (DataContext is GeneratorViewModel vm)
-                    vm.OpenFolder(item);
-            };
-            menu.Items.Add(openFolder);
-
-            // تولید مجدد (با تایید)
-            var regenerate = new MenuItem { Header = "🔄 تولید مجدد", Tag = item };
-            regenerate.Click += (s, args) =>
-            {
-                if (DataContext is GeneratorViewModel vm)
-                    vm.RegenerateWithConfirmation(item);
-            };
-            menu.Items.Add(regenerate);
-
-            menu.Items.Add(new Separator());
-
-            // حذف لاگ
-            var deleteLog = new MenuItem { Header = "🗑 حذف لاگ", Tag = item };
-            deleteLog.Click += (s, args) =>
-            {
-                if (DataContext is GeneratorViewModel vm)
-                    vm.DeleteLog(item);
-            };
-            menu.Items.Add(deleteLog);
-
-            // حذف فایل و لاگ (با تایید)
-            var deleteAll = new MenuItem { Header = "🗑 حذف فایل و لاگ", Tag = item };
-            deleteAll.Click += (s, args) =>
-            {
-                if (DataContext is GeneratorViewModel vm)
-                    vm.DeleteReportWithConfirmation(item);
-            };
-            menu.Items.Add(deleteAll);
-
-            menu.Items.Add(new Separator());
-
-            // کپی مسیر فایل
-            var copyPath = new MenuItem { Header = "📋 کپی مسیر فایل", Tag = item };
-            copyPath.Click += (s, args) =>
-            {
-                Clipboard.SetText(item.OutputPath);
-                if (DataContext is GeneratorViewModel vm)
-                    vm.StatusMessage = $"مسیر کپی شد: {item.OutputPath}";
-            };
-            menu.Items.Add(copyPath);
-
-            menu.IsOpen = true;
+                // پیدا کردن DataGridRow از طریق visual tree
+                var current = depObj;
+                while (current != null)
+                {
+                    if (current is DataGridRow row)
+                    {
+                        if (row.Item is ReportHistoryItem item && !dg.SelectedItems.Contains(item))
+                            dg.SelectedItem = item;
+                        break;
+                    }
+                    current = VisualTreeHelper.GetParent(current);
+                }
+            }
         }
+    }
+
+    // ─── Helper: دریافت آیتم‌های انتخاب‌شده ───
+    private List<ReportHistoryItem> GetSelectedHistoryItems()
+    {
+        var selected = HistoryGrid.SelectedItems;
+        if (selected == null || selected.Count == 0)
+        {
+            if (HistoryGrid.SelectedItem is ReportHistoryItem single)
+                return new List<ReportHistoryItem> { single };
+            return new List<ReportHistoryItem>();
+        }
+        return selected.Cast<ReportHistoryItem>().ToList();
+    }
+
+    // ─── Event Handlers for XAML ContextMenu ───
+
+    private void HistoryMenu_OpenReport(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0) return;
+        if (DataContext is GeneratorViewModel vm) vm.OpenReport(items[0]);
+    }
+
+    private void HistoryMenu_OpenFolder(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0) return;
+        if (DataContext is GeneratorViewModel vm) vm.OpenFolder(items[0]);
+    }
+
+    private void HistoryMenu_Regenerate(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0) return;
+        if (DataContext is GeneratorViewModel vm) vm.RegenerateWithConfirmation(items[0]);
+    }
+
+    private void HistoryMenu_DeleteSelected(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0) return;
+        if (DataContext is GeneratorViewModel vm) vm.DeleteSelectedHistory(items);
+    }
+
+    private void HistoryMenu_DeleteWithFile(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0) return;
+        if (DataContext is GeneratorViewModel vm) vm.DeleteSelectedHistoryWithFile(items);
+    }
+
+    // ─── Event Handlers for XAML Toolbar Buttons ───
+
+    private void History_SelectAll(object sender, RoutedEventArgs e)
+    {
+        HistoryGrid.SelectAll();
+        if (DataContext is GeneratorViewModel vm)
+            vm.StatusMessage = $"همه {HistoryGrid.SelectedItems.Count} ردیف انتخاب شد";
+    }
+
+    private void History_DeleteSelected(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0)
+        {
+            if (DataContext is GeneratorViewModel vm0) vm0.StatusMessage = "موردی انتخاب نشده — ابتدا ردیف‌ها را انتخاب کنید";
+            return;
+        }
+        if (DataContext is GeneratorViewModel vm) vm.DeleteSelectedHistory(items);
+    }
+
+    private void History_DeleteSelectedWithFile(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0)
+        {
+            if (DataContext is GeneratorViewModel vm0) vm0.StatusMessage = "موردی انتخاب نشده — ابتدا ردیف‌ها را انتخاب کنید";
+            return;
+        }
+        if (DataContext is GeneratorViewModel vm) vm.DeleteSelectedHistoryWithFile(items);
+    }
+
+    private void HistoryMenu_CopyPath(object sender, RoutedEventArgs e)
+    {
+        var items = GetSelectedHistoryItems();
+        if (items.Count == 0) return;
+        Clipboard.SetText(items[0].OutputPath);
+        if (DataContext is GeneratorViewModel vm)
+            vm.StatusMessage = $"مسیر کپی شد: {items[0].OutputPath}";
     }
 }
