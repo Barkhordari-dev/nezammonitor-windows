@@ -26,6 +26,7 @@ public sealed class NezamDatabase : IDisposable
         cmd.ExecuteNonQuery();
     }
 
+
     private static string SafeGetString(SqliteDataReader reader, string column)
     {
         try
